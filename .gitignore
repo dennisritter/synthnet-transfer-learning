@@ -145,3 +145,4 @@ __MACOSX
 *.zip
 data
 out
+wandb
