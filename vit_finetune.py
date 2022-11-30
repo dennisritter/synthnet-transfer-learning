@@ -41,6 +41,12 @@ import click
     required=True,
 )
 @click.option(
+    '--checkpoint',
+    help="Path to a pretrained checkpoint to load.",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    required=False,
+)
+@click.option(
     '--out_root_dir',
     help='Output root directory path. Timestamp will be appended on runtime.',
     type=click.Path(),
