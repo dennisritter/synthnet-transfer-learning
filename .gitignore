@@ -146,3 +146,5 @@ __MACOSX
 data
 out
 wandb
+logs
+vit-sweeps
