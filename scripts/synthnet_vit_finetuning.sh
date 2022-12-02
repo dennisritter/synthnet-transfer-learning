@@ -1,6 +1,6 @@
 #!/bin/bash
 PROJECT_NAME='synthnet-vit-finetuning'
-OUTPUT_DIR='out/synthnet_finetuning/vit' # + RUN_NAME on runtime
+OUTPUT_DIR='out/synthnet_finetuning/synthnet_finetuning/vit'
 
 TRAIN_DS='data/topex-printer/train'
 TEST_DS='data/topex-printer/test'
