@@ -130,7 +130,7 @@ import wandb
 def main(**kwargs):
     # Parse click parameters and load config
     args = SimpleNamespace(**kwargs)
-
+    wandb.login()
     ###############################################################
     ## LOADING DATA
     ###############################################################
@@ -255,6 +255,7 @@ def main(**kwargs):
             # dataloader_num_workers=0,
             disable_tqdm=False,
             load_best_model_at_end=True,
+            save_total_limit=3,
             metric_for_best_model="accuracy",
             remove_unused_columns=False,
             report_to="wandb")
@@ -297,6 +298,7 @@ def main(**kwargs):
                                               evaluation_strategy='epoch',
                                               logging_strategy='epoch',
                                               load_best_model_at_end=True,
+                                              save_total_limit=3,
                                               remove_unused_columns=False,
                                               fp16=True)
 
@@ -334,16 +336,7 @@ def main(**kwargs):
             val_ds = val_ds.train_test_split(test_size=args.hps_val_size, stratify_by_column='label')['test']
 
         # method
-        sweep_config = {'method': 'random', 
-            "datasets":{
-                "train_ds": args.train_ds, 
-                "train_ds_samples": train_ds.num_rows, 
-                "val_ds": args.val_ds or args.train_ds,
-                "val_ds_samples": val_ds.num_rows,
-                "test_ds": args.test_ds,
-                "test_ds_samples": test_ds.num_rows,
-            },
-        }
+        sweep_config = {'method': 'random'}
         # hyperparameters
         parameters_dict = {
             'epochs': {
