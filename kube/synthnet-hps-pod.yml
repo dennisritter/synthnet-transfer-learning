@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: synthnet-hps-pod
+spec:
+  restartPolicy: Never
+  containers:
+  - name: synthnet-hps-pod
+    image: beuthdritter/synthnet-finetuning
+    volumeMounts:
+            - name: synthnet-finetuning-volume
+              mountPath: /workspace/data
+            - name: output-volume
+              mountPath: /workspace/out
+    command:
+      [
+        "python",
+        "run_retrieval.py" ,
+        "-c" ,
+        "run_configs/7054-12-300-l_drucker_se_su_st_st_512_32__tr123_pb.json",
+      ]
+    resources:
+      limits:
+        nvidia.com/gpu: 1
+        memory: "32Gi"
+        cpu: "32"
+  nodeSelector:
+    gpu: v100
+  volumes:
+  - name: synthnet-finetuning-volume 
+    persistentVolumeClaim:
+      claimName: synthnet-finetuning-pvc
+  - name: output-volume 
+    persistentVolumeClaim:
+      claimName: output-pvc
