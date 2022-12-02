@@ -112,17 +112,20 @@ import wandb
 )
 @click.option(
     '--hps_train_size',
-    help='Relative size of val_ds in HP_SEARCH mode',
+    help='Relative size of val_ds in HP_SEARCH mode [0,1]',
     type=float,
-    show_default=True,
-    default=0.2,
 )
 @click.option(
     '--hps_val_size',
-    help='Relative size of val_ds in HP_SEARCH mode',
+    help='Relative size of val_ds in HP_SEARCH mode [0,1]',
+    type=float,
+)
+@click.option(
+    '--hps_run_count',
+    help='Number of runs to start with different hyperparameters',
     type=float,
     show_default=True,
-    default=0.2,
+    default=10,
 )
 def main(**kwargs):
     # Parse click parameters and load config
@@ -325,15 +328,26 @@ def main(**kwargs):
         )
 
     if args.mode == "HP_SEARCH":
-        train_ds = train_ds.train_test_split(train_size=args.hps_train_size, stratify_by_column='label')['train']
-        val_ds = val_ds.train_test_split(test_size=args.hps_val_size, stratify_by_column='label')['test']
+        if args.hps_train_size:
+            train_ds = train_ds.train_test_split(train_size=args.hps_train_size, stratify_by_column='label')['train']
+        if args.hps_val_size:
+            val_ds = val_ds.train_test_split(test_size=args.hps_val_size, stratify_by_column='label')['test']
 
         # method
-        sweep_config = {'method': 'random'}
+        sweep_config = {'method': 'random', 
+            "datasets":{
+                "train_ds": args.train_ds, 
+                "train_ds_samples": train_ds.num_rows, 
+                "val_ds": args.val_ds or args.train_ds,
+                "val_ds_samples": val_ds.num_rows,
+                "test_ds": args.test_ds,
+                "test_ds_samples": test_ds.num_rows,
+            },
+        }
         # hyperparameters
         parameters_dict = {
             'epochs': {
-                'value': 10
+                'value': args.num_train_epochs
             },
             'batch_size': {
                 'values': [8, 16, 32, 64]
@@ -349,14 +363,6 @@ def main(**kwargs):
         }
         sweep_config['parameters'] = parameters_dict
         sweep_id = wandb.sweep(sweep_config, project=args.project_name)
-        wandb.config.update({"datasets":{
-            "train_ds": args.train_ds, 
-            "train_ds_samples": train_ds.num_rows, 
-            "val_ds": args.val_ds or args.train_ds,
-            "val_ds_samples": val_ds.num_rows,
-            "test_ds": args.test_ds,
-            "test_ds_samples": test_ds.num_rows,
-        }})
         wandb.agent(sweep_id, train_hyperparam_search, count=20)
 
 
