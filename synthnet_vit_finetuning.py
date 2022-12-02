@@ -22,7 +22,7 @@ import wandb
 )
 @click.option(
     '--output_dir',
-    help='Output directory path. Timestamp will be appended on runtime.',
+    help='Output directory path.',
     type=click.Path(),
     required=True,
 )
@@ -34,9 +34,8 @@ import wandb
 )
 @click.option(
     '--val_ds',
-    help="Validation Dataset in Huggingface imagefolder structure.",
+    help="Validation Dataset in Huggingface imagefolder structure. If no val_ds given, it will be split from the train_ds.",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
-    required=True,
 )
 @click.option(
     '--test_ds',
@@ -46,7 +45,7 @@ import wandb
 )
 @click.option(
     '--run_name',
-    help="Name for this training run. Timestamp will be appended on runtime.",
+    help="Name for this training run.",
     type=str,
     required=False,
 )
@@ -61,6 +60,13 @@ import wandb
     help="Path to a pretrained checkpoint to load.",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
     required=False,
+)
+@click.option(
+    '--split_val_size',
+    help='Split size from train_ds used for validation (val_ds).',
+    type=float,
+    show_default=True,
+    default=0.1,
 )
 @click.option(
     '--seed',
@@ -105,11 +111,18 @@ import wandb
     default=1e-2,
 )
 @click.option(
-    '--search_hyperparams',
-    help='if true: search hyperparameters with backed in sweep_config (wandb). Might ignore several other config-args given.',
-    type=bool,
+    '--hps_train_size',
+    help='Relative size of val_ds in HP_SEARCH mode',
+    type=float,
     show_default=True,
-    default=False,
+    default=0.2,
+)
+@click.option(
+    '--hps_val_size',
+    help='Relative size of val_ds in HP_SEARCH mode',
+    type=float,
+    show_default=True,
+    default=0.2,
 )
 def main(**kwargs):
     # Parse click parameters and load config
@@ -123,8 +136,16 @@ def main(**kwargs):
     # https://huggingface.co/docs/datasets/image_dataset
     # Ensure format ds_dir/label/file.png
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
-    val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="train")
+    if args.val_ds:
+        # Use val_ds as defined by args
+        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="test")
+    else:
+        # split up training into training + validation
+        splits = train_ds.train_test_split(test_size=args.split_val_size)
+        train_ds = splits['train']
+        val_ds = splits['test']
     test_ds = load_dataset("imagefolder", data_dir=args.test_ds, split="test")
+
     # map ids to labels and vice versa
     id2label = {id: label for id, label in enumerate(train_ds.features['label'].names)}
     label2id = {label: id for id, label in id2label.items()}
@@ -137,6 +158,7 @@ def main(**kwargs):
     feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
     # Define Transforms
     normalize = Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std)
+    # NOTE: type(feature_extractor.size) changes from INT to DICT (transformers 4.24 -> 4.25)
     _train_transforms = Compose([
         Resize(feature_extractor.size),
         RandomHorizontalFlip(),
@@ -185,7 +207,7 @@ def main(**kwargs):
     num_labels = len(id2label.keys())
     model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k', num_labels=num_labels, id2label=id2label, label2id=label2id)
 
-    def train_finetune(
+    def train_finetuning(
         run_name: str,
         output_dir: str,
         seed: int,
@@ -199,8 +221,16 @@ def main(**kwargs):
         wandb.init(project=args.project_name)
         if run_name:
             wandb.run.name = run_name
+        wandb.config.update({"datasets":{
+            "train_ds": args.train_ds, 
+            "train_ds_samples": train_ds.num_rows, 
+            "val_ds": args.val_ds or args.train_ds,
+            "val_ds_samples": val_ds.num_rows,
+            "test_ds": args.test_ds,
+            "test_ds_samples": test_ds.num_rows,
+        }})
         # define train arguments
-        timestamp = time.strftime("%y%m%d%M%S", time.gmtime())
+        # timestamp = time.strftime("%y%m%d%M%S", time.gmtime())
         training_args = TrainingArguments(
             # run_name=run_name,
             output_dir=f"{output_dir}/{wandb.run.name}",
@@ -282,7 +312,7 @@ def main(**kwargs):
             trainer.train()
 
     if args.mode == "FINETUNING":
-        train_finetune(
+        train_finetuning(
             run_name=args.run_name,
             output_dir=args.output_dir,
             seed=args.seed,
@@ -295,15 +325,15 @@ def main(**kwargs):
         )
 
     if args.mode == "HP_SEARCH":
-        train_ds = train_ds.train_test_split(train_size=0.2, stratify_by_column='label')['train']
-        val_ds = val_ds.train_test_split(test_size=0.2, stratify_by_column='label')['test']
+        train_ds = train_ds.train_test_split(train_size=args.hps_train_size, stratify_by_column='label')['train']
+        val_ds = val_ds.train_test_split(test_size=args.hps_val_size, stratify_by_column='label')['test']
 
         # method
         sweep_config = {'method': 'random'}
         # hyperparameters
         parameters_dict = {
             'epochs': {
-                'value': 20
+                'value': 10
             },
             'batch_size': {
                 'values': [8, 16, 32, 64]
@@ -319,6 +349,14 @@ def main(**kwargs):
         }
         sweep_config['parameters'] = parameters_dict
         sweep_id = wandb.sweep(sweep_config, project=args.project_name)
+        wandb.config.update({"datasets":{
+            "train_ds": args.train_ds, 
+            "train_ds_samples": train_ds.num_rows, 
+            "val_ds": args.val_ds or args.train_ds,
+            "val_ds_samples": val_ds.num_rows,
+            "test_ds": args.test_ds,
+            "test_ds_samples": test_ds.num_rows,
+        }})
         wandb.agent(sweep_id, train_hyperparam_search, count=20)
 
 

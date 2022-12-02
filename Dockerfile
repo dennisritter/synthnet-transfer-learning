@@ -7,7 +7,7 @@ RUN rm /etc/apt/sources.list.d/nvidia-ml.list
 # Install dependencies
 RUN apt update && \
     pip install numpy \
-    pip install transformers \
+    pip install transformers==4.24 \
     pip install datasets \
     pip install evaluate \
     pip install click \
