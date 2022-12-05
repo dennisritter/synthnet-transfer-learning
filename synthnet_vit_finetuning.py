@@ -224,14 +224,16 @@ def main(**kwargs):
         wandb.init(project=args.project_name)
         if run_name:
             wandb.run.name = run_name
-        wandb.config.update({"datasets":{
-            "train_ds": args.train_ds, 
-            "train_ds_samples": train_ds.num_rows, 
-            "val_ds": args.val_ds or args.train_ds,
-            "val_ds_samples": val_ds.num_rows,
-            "test_ds": args.test_ds,
-            "test_ds_samples": test_ds.num_rows,
-        }})
+        wandb.config.update({
+            "datasets": {
+                "train_ds": args.train_ds,
+                "train_ds_samples": train_ds.num_rows,
+                "val_ds": args.val_ds or args.train_ds,
+                "val_ds_samples": val_ds.num_rows,
+                "test_ds": args.test_ds,
+                "test_ds_samples": test_ds.num_rows,
+            }
+        })
         # define train arguments
         # timestamp = time.strftime("%y%m%d%M%S", time.gmtime())
         training_args = TrainingArguments(
@@ -258,7 +260,8 @@ def main(**kwargs):
             save_total_limit=3,
             metric_for_best_model="accuracy",
             remove_unused_columns=False,
-            report_to="wandb")
+            report_to="wandb",
+        )
 
         # define trainer and start training loop
         trainer = Trainer(
@@ -287,20 +290,25 @@ def main(**kwargs):
             config = wandb.config
 
             # set training arguments
-            training_args = TrainingArguments(output_dir=f'{args.output_dir}',
-                                              report_to='wandb',
-                                              num_train_epochs=config.epochs,
-                                              learning_rate=config.learning_rate,
-                                              weight_decay=config.weight_decay,
-                                              per_device_train_batch_size=config.batch_size,
-                                              per_device_eval_batch_size=16,
-                                              save_strategy='epoch',
-                                              evaluation_strategy='epoch',
-                                              logging_strategy='epoch',
-                                              load_best_model_at_end=True,
-                                              save_total_limit=3,
-                                              remove_unused_columns=False,
-                                              fp16=True)
+            training_args = TrainingArguments(
+                output_dir=f'{args.output_dir}',
+                # seed=,
+                save_strategy='epoch',
+                evaluation_strategy='epoch',
+                logging_strategy='epoch',
+                num_train_epochs=config.epochs,
+                per_device_train_batch_size=config.batch_size,
+                per_device_eval_batch_size=config.batch_size,
+                learning_rate=config.learning_rate,
+                weight_decay=config.weight_decay,
+                optim="adamw_torch",
+                fp16=True,
+                save_total_limit=3,
+                load_best_model_at_end=True,
+                metric_for_best_model="accuracy",
+                remove_unused_columns=False,
+                report_to='wandb',
+            )
 
             # define training loop
             trainer = Trainer(
@@ -335,27 +343,31 @@ def main(**kwargs):
         if args.hps_val_size:
             val_ds = val_ds.train_test_split(test_size=args.hps_val_size, stratify_by_column='label')['test']
 
-        # method
-        sweep_config = {'method': 'random'}
-        # hyperparameters
-        parameters_dict = {
-            'epochs': {
-                'value': args.num_train_epochs
+        sweep_config = {
+            'method': 'bayes',
+            'metric': {
+                'name': 'accuracy',
+                'goal': 'maximize'
             },
-            'batch_size': {
-                'values': [8, 16, 32, 64]
+            'parameters': {
+                'epochs': {
+                    'value': args.num_train_epochs
+                },
+                'batch_size': {
+                    'values': [8, 16, 32, 64]
+                },
+                'learning_rate': {
+                    'min': 1e-5,
+                    'max': 1e-4
+                },
+                'weight_decay': {
+                    'min': 0.01,
+                    'max': 0.1
+                },
             },
-            'learning_rate': {
-                'distribution': 'log_uniform_values',
-                'min': 1e-5,
-                'max': 1e-4
-            },
-            'weight_decay': {
-                'values': [0.01, 0.1]
-            },
+            'distribution': {}
         }
-        sweep_config['parameters'] = parameters_dict
-        sweep_id = wandb.sweep(sweep_config, project=args.project_name)
+        sweep_id = wandb.sweep(sweep=sweep_config, project=args.project_name)
         wandb.agent(sweep_id, train_hyperparam_search, count=20)
 
 
