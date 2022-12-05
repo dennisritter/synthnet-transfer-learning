@@ -1,8 +1,8 @@
 #!/bin/bash
 
-TRAIN_DS='data/evaluation_pipeline_input/7054-12-300-l_drucker_se_su_st_st_512_32/images'
-TEST_DS='data/evaluation_pipeline_input/topex-real-123_pb_256/images'
-OUT='data/topex-printer'
+TRAIN_DS='/home/dennis/Desktop/work/evaluation_pipeline_data/modelnet10/train/images'
+TEST_DS='/home/dennis/Desktop/work/evaluation_pipeline_data/modelnet10/test/images'
+OUT='data/modelnet10'
 
 python data_conversion.py \
 --input_train_ds $TRAIN_DS \
