@@ -291,7 +291,7 @@ def main(**kwargs):
 
             # set training arguments
             training_args = TrainingArguments(
-                output_dir=f'{args.output_dir}',
+                output_dir=f'{args.output_dir}/{wandb.run.name}',
                 # seed=,
                 save_strategy='epoch',
                 evaluation_strategy='epoch',
