@@ -62,6 +62,20 @@ import wandb
     required=False,
 )
 @click.option(
+    '--resume',
+    help="Do you want to resume a former run?",
+    type=bool,
+    required=False,
+    show_default=True,
+    default=False,
+)
+@click.option(
+    '--resume_id',
+    help="WandB run id you want to resume",
+    type=str,
+    required=False,
+)
+@click.option(
     '--split_val_size',
     help='Split size from train_ds used for validation (val_ds).',
     type=float,
@@ -219,9 +233,13 @@ def main(**kwargs):
         per_device_eval_batch_size: int,
         learning_rate: float,
         weight_decay: float,
-        checkpoint: str,
+        resume_id: str,
+        resume: bool,
     ):
-        wandb.init(project=args.project_name)
+        if resume:
+            wandb.init(project=args.project_name, id=resume_id, resume="must")
+        else:
+            wandb.init(project=args.project_name)
         if run_name:
             wandb.run.name = run_name
         wandb.config.update({
@@ -273,10 +291,7 @@ def main(**kwargs):
             compute_metrics=compute_metrics,
             tokenizer=feature_extractor,
         )
-        if args.checkpoint:
-            trainer.train(resume_from_checkpoint=checkpoint)
-        else:
-            trainer.train()
+        trainer.train(resume_from_checkpoint=args.resume)
 
         ###############################################################
         ## EVALUATION
@@ -334,7 +349,8 @@ def main(**kwargs):
             per_device_eval_batch_size=args.per_device_eval_batch_size,
             learning_rate=args.learning_rate,
             weight_decay=args.weight_decay,
-            checkpoint=args.checkpoint,
+            resume_id=args.resume_id,
+            resume=args.resume,
         )
 
     if args.mode == "HP_SEARCH":
