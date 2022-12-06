@@ -362,7 +362,7 @@ def main(**kwargs):
         sweep_config = {
             'method': 'bayes',
             'metric': {
-                'name': 'accuracy',
+                'name': 'eval/accuracy',
                 'goal': 'maximize'
             },
             'parameters': {
