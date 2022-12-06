@@ -1,17 +1,16 @@
 #!/bin/bash
-PROJECT_NAME='synthnet-vit-finetuning'
-OUTPUT_DIR='out/synthnet_finetuning/synthnet_finetuning/vit'
+PROJECT_NAME='mi3dor-vit-finetuning'
+OUTPUT_DIR='out/synthnet_finetuning/mi3dor_finetuning/vit'
 
-TRAIN_DS='data/topex-printer/train'
-TEST_DS='data/topex-printer/test'
+TRAIN_DS='data/mi3dor/train'
+TEST_DS='data/mi3dor/test'
 SPLIT_VAL_SIZE=0.1
 
 MODE='FINETUNING'
-EPOCHS=20
-BATCH_SIZE=64
-LR=6e-5
-WEIGHT_DECAY=0.01
-
+EPOCHS=50
+BATCH_SIZE=16
+LR=3e-5
+WEIGHT_DECAY=0.09
 # python synthnet_vit_finetuning.py \
 # --project_name $PROJECT_NAME \
 # --output_dir $OUTPUT_DIR \
@@ -42,5 +41,5 @@ python synthnet_vit_finetuning.py \
 --per_device_eval_batch_size $BATCH_SIZE \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
---resume True \
---resume_id 87b93r8m
+#--resume True \
+#--resume_id ABC123
