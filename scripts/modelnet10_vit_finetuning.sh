@@ -8,9 +8,9 @@ SPLIT_VAL_SIZE=0.1
 
 MODE='FINETUNING'
 EPOCHS=20
-BATCH_SIZE=64
-LR=4e-5
-WEIGHT_DECAY=0.05
+BATCH_SIZE=16
+LR=0.00006432267841619988
+WEIGHT_DECAY=0.016886733495868222
 
 python synthnet_vit_finetuning.py \
 --project_name $PROJECT_NAME \
@@ -26,7 +26,7 @@ python synthnet_vit_finetuning.py \
 --weight_decay $WEIGHT_DECAY 
 
 
-# # atomic-voice-1 // 87b93r8m :: 20 epochs
+# # apricot-sweep-12 // jql9ubbi :: 20 epochs
 # # CONTINUATION
 # EPOCHS=20
 # python synthnet_vit_finetuning.py \
@@ -42,4 +42,4 @@ python synthnet_vit_finetuning.py \
 # --learning_rate $LR \
 # --weight_decay $WEIGHT_DECAY \
 # --resume True \
-# --resume_id 87b93r8m
+# --resume_id jql9ubbi
