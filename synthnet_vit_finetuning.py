@@ -151,13 +151,13 @@ def main(**kwargs):
 
     # load datasets from image directory (huggingface)
     # https://huggingface.co/docs/datasets/image_dataset
-    # Ensure format ds_dir/label/file.png
+    # - Ensure format ds_dir/label/filename_SPLIT.png
+    # - Each filename has to include the split name (e.g.: myname_test, train_my_name, my_val_name) 
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
+    # Either use given val dataset or else split up training into training + validation
     if args.val_ds:
-        # Use val_ds as defined by args
-        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="test")
+        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="val")
     else:
-        # split up training into training + validation
         splits = train_ds.train_test_split(test_size=args.split_val_size)
         train_ds = splits['train']
         val_ds = splits['test']
