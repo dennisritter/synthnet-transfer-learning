@@ -156,7 +156,7 @@ def main(**kwargs):
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
     # Either use given val dataset or else split up training into training + validation
     if args.val_ds:
-        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="val")
+        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="validation")
     else:
         splits = train_ds.train_test_split(test_size=args.split_val_size)
         train_ds = splits['train']
