@@ -178,6 +178,7 @@ def main(**kwargs):
     # NOTE: type(feature_extractor.size) changes from INT to DICT (transformers 4.24 -> 4.25)
     _train_transforms = Compose([
         Resize(feature_extractor.size),
+        CenterCrop(feature_extractor.size),
         RandomHorizontalFlip(),
         RandomVerticalFlip(),
         ToTensor(),
