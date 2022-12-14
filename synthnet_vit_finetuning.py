@@ -73,13 +73,6 @@ import wandb
     required=False,
 )
 @click.option(
-    '--split_val_size',
-    help='Split size from train_ds used for validation (val_ds).',
-    type=float,
-    show_default=True,
-    default=0.1,
-)
-@click.option(
     '--seed',
     help='random seed',
     type=int,
@@ -87,39 +80,39 @@ import wandb
     default=42,
 )
 @click.option(
-    '--total_steps',
-    help='Total training steps',
-    type=int,
-    show_default=True,
-    default=2500,
-)
-@click.option(
-    '--warmup_steps',
-    help='Warmup steps',
-    type=int,
-    show_default=True,
-    default=200,
-)
-@click.option(
     '--batch_size',
     help='The batch size',
     type=int,
     show_default=True,
-    default=16,
+    default=8,
+)
+@click.option(
+    '--num_train_epochs',
+    help='number of epochs to train',
+    type=int,
+    show_default=True,
+    default=20,
 )
 @click.option(
     '--learning_rate',
     help='TrainArguments.learning_rate',
     type=float,
     show_default=True,
-    default=2e-5,
+    default=3e-3,
 )
 @click.option(
     '--weight_decay',
     help='TrainArguments.weight_decay',
     type=float,
     show_default=True,
-    default=1e-2,
+    default=3e-2,
+)
+@click.option(
+    '--warmup_ratio',
+    help='Warmup steps',
+    type=float,
+    show_default=True,
+    default=0.1,
 )
 def main(**kwargs):
     # Parse click parameters and load config
@@ -135,11 +128,10 @@ def main(**kwargs):
     # - Each filename has to include the split name (e.g.: myname_test, train_my_name, my_val_name)
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
     # Either use given val dataset or else split up training into training + validation
-    # TODO: fix?!
     if args.val_ds:
-        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="validation")
+        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="test")
     else:
-        splits = train_ds.train_test_split(test_size=args.split_val_size)
+        splits = train_ds.train_test_split(test_size=0.1)
         train_ds = splits['train']
         val_ds = splits['test']
     test_ds = load_dataset("imagefolder", data_dir=args.test_ds, split="test")
@@ -216,6 +208,7 @@ def main(**kwargs):
         per_device_eval_batch_size: int,
         learning_rate: float,
         weight_decay: float,
+        warmup_ratio: float,
         resume_id: str,
         resume: bool,
     ):
@@ -235,8 +228,6 @@ def main(**kwargs):
                 "test_ds_samples": test_ds.num_rows,
             }
         })
-        # define train arguments
-        # timestamp = time.strftime("%y%m%d%M%S", time.gmtime())
         training_args = TrainingArguments(
             # run_name=run_name,
             output_dir=f"{output_dir}/{wandb.run.name}",
@@ -249,6 +240,7 @@ def main(**kwargs):
             per_device_eval_batch_size=per_device_eval_batch_size,
             learning_rate=learning_rate,
             weight_decay=weight_decay,
+            warmup_ratio=warmup_ratio,
             optim="adamw_torch",
             fp16=True,
             # adam_beta1=0.9,
@@ -279,6 +271,7 @@ def main(**kwargs):
         wandb.log(outputs.metrics)
         print(f"{outputs.metrics=}")
 
+    # TODO: Fix args
     def train_hyperparam_search(config=None):
         with wandb.init(config=config):
             # set sweep configuration
@@ -331,16 +324,17 @@ def main(**kwargs):
             run_name=args.run_name,
             output_dir=args.output_dir,
             seed=args.seed,
-            total_steps=args.total_steps,
-            warmup_steps=args.warmup_steps,
             per_device_train_batch_size=args.batch_size,
             per_device_eval_batch_size=args.batch_size,
+            num_train_epochs=args.num_train_epochs,
             learning_rate=args.learning_rate,
             weight_decay=args.weight_decay,
+            warmup_ratio=args.warmup_ratio,
             resume_id=args.resume_id,
             resume=args.resume,
         )
 
+    # TODO: fix trainargs
     if args.mode == "HP_SEARCH":
         sweep_config = {
             'method': 'grid',
