@@ -1,13 +1,10 @@
-import os
-import time
 from types import SimpleNamespace
 import numpy as np
 from datasets import load_dataset
 from transformers import ViTFeatureExtractor, ViTForImageClassification, TrainingArguments, Trainer
 import evaluate
 import torch
-from torchvision.transforms import (CenterCrop, Compose, Normalize, RandomHorizontalFlip, RandomVerticalFlip, Resize, ToTensor)
-# import torchvision.transforms as transforms
+from torchvision.transforms import (RandAugment, CenterCrop, Compose, Normalize, RandomHorizontalFlip, RandomVerticalFlip, Resize, ToTensor)
 # from PIL import Image
 import click
 import wandb
@@ -90,22 +87,22 @@ import wandb
     default=42,
 )
 @click.option(
-    '--num_train_epochs',
-    help='TrainArguments.num_train_epochs',
+    '--total_steps',
+    help='Total training steps',
     type=int,
     show_default=True,
-    default=3,
+    default=2500,
 )
 @click.option(
-    '--per_device_train_batch_size',
-    help='TrainArguments.per_device_train_batch_size',
+    '--warmup_steps',
+    help='Warmup steps',
     type=int,
     show_default=True,
-    default=16,
+    default=200,
 )
 @click.option(
-    '--per_device_eval_batch_size',
-    help='TrainArguments.per_device_eval_batch_size',
+    '--batch_size',
+    help='The batch size',
     type=int,
     show_default=True,
     default=16,
@@ -124,23 +121,6 @@ import wandb
     show_default=True,
     default=1e-2,
 )
-@click.option(
-    '--hps_train_size',
-    help='Relative size of val_ds in HP_SEARCH mode [0,1]',
-    type=float,
-)
-@click.option(
-    '--hps_val_size',
-    help='Relative size of val_ds in HP_SEARCH mode [0,1]',
-    type=float,
-)
-@click.option(
-    '--hps_run_count',
-    help='Number of runs to start with different hyperparameters',
-    type=float,
-    show_default=True,
-    default=10,
-)
 def main(**kwargs):
     # Parse click parameters and load config
     args = SimpleNamespace(**kwargs)
@@ -152,7 +132,7 @@ def main(**kwargs):
     # load datasets from image directory (huggingface)
     # https://huggingface.co/docs/datasets/image_dataset
     # - Ensure format ds_dir/label/filename_SPLIT.png
-    # - Each filename has to include the split name (e.g.: myname_test, train_my_name, my_val_name) 
+    # - Each filename has to include the split name (e.g.: myname_test, train_my_name, my_val_name)
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
     # Either use given val dataset or else split up training into training + validation
     if args.val_ds:
@@ -179,6 +159,7 @@ def main(**kwargs):
     _train_transforms = Compose([
         Resize(feature_extractor.size),
         CenterCrop(feature_extractor.size),
+        RandAugment(),
         RandomHorizontalFlip(),
         RandomVerticalFlip(),
         ToTensor(),
@@ -293,11 +274,8 @@ def main(**kwargs):
             tokenizer=feature_extractor,
         )
         trainer.train(resume_from_checkpoint=args.resume)
-
-        ###############################################################
-        ## EVALUATION
-        ###############################################################
         outputs = trainer.predict(test_ds)
+        wandb.log(outputs.metrics)
         print(f"{outputs.metrics=}")
 
     def train_hyperparam_search(config=None):
@@ -309,10 +287,14 @@ def main(**kwargs):
             training_args = TrainingArguments(
                 output_dir=f'{args.output_dir}/{wandb.run.name}',
                 # seed=,
-                save_strategy='epoch',
-                evaluation_strategy='epoch',
-                logging_strategy='epoch',
-                num_train_epochs=config.epochs,
+                save_strategy='steps',
+                evaluation_strategy='steps',
+                logging_strategy='steps',
+                eval_steps=25,
+                logging_steps=25,
+                save_steps=25,
+                max_steps=config.steps_total_warmup[0],
+                warmup_steps=config.steps_total_warmup[1],
                 per_device_train_batch_size=config.batch_size,
                 per_device_eval_batch_size=config.batch_size,
                 learning_rate=config.learning_rate,
@@ -339,15 +321,19 @@ def main(**kwargs):
 
             # start training loop
             trainer.train()
+            outputs = trainer.predict(test_ds)
+            wandb.log(outputs.metrics)
+            print(f"{outputs.metrics=}")
 
     if args.mode == "FINETUNING":
         train_finetuning(
             run_name=args.run_name,
             output_dir=args.output_dir,
             seed=args.seed,
-            num_train_epochs=args.num_train_epochs,
-            per_device_train_batch_size=args.per_device_train_batch_size,
-            per_device_eval_batch_size=args.per_device_eval_batch_size,
+            total_steps=args.total_steps,
+            warmup_steps=args.warmup_steps,
+            per_device_train_batch_size=args.batch_size,
+            per_device_eval_batch_size=args.batch_size,
             learning_rate=args.learning_rate,
             weight_decay=args.weight_decay,
             resume_id=args.resume_id,
@@ -355,37 +341,29 @@ def main(**kwargs):
         )
 
     if args.mode == "HP_SEARCH":
-        if args.hps_train_size:
-            train_ds = train_ds.train_test_split(train_size=args.hps_train_size, stratify_by_column='label')['train']
-        if args.hps_val_size:
-            val_ds = val_ds.train_test_split(test_size=args.hps_val_size, stratify_by_column='label')['test']
-
         sweep_config = {
-            'method': 'bayes',
+            'method': 'grid',
             'metric': {
                 'name': 'eval/accuracy',
                 'goal': 'maximize'
             },
             'parameters': {
-                'epochs': {
-                    'value': args.num_train_epochs
+                'steps_total_warmup': {
+                    'values': [(2000, 200)]
                 },
                 'batch_size': {
-                    'values': [8, 16, 32, 64]
+                    'value': args.batch_size
                 },
                 'learning_rate': {
-                    'min': 1e-5,
-                    'max': 1e-4
+                    'values': [1e-3, 3e-3, 0.01],
                 },
                 'weight_decay': {
-                    'min': 0.01,
-                    'max': 0.1
+                    'value': 0.03,
                 },
-            },
-            'distribution': {}
+            }
         }
         sweep_id = wandb.sweep(sweep=sweep_config, project=args.project_name)
-        wandb.agent(sweep_id, train_hyperparam_search, count=20)
+        wandb.agent(sweep_id, train_hyperparam_search)
 
 
 if __name__ == "__main__":
