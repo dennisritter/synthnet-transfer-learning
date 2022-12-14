@@ -7,7 +7,9 @@ TRAIN_DS='data/modelnet10/train'
 # VAL_DS='data/...'
 TEST_DS='data/modelnet10/test'
 MODE='HP_SEARCH'
-EPOCHS=5
+BATCH_SIZE=256
+# TOTAL_STEPS=
+# WARMUP_STEPS=
 
 wandb login $WANDB_API_KEY
 
@@ -16,6 +18,5 @@ python synthnet_vit_finetuning.py \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
 --test_ds $TEST_DS \
+--batch_size $BATCH_SIZE \
 --mode $MODE \
---num_train_epochs $EPOCHS \
---hps_run_count 10

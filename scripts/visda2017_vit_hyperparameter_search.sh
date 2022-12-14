@@ -7,7 +7,7 @@ TRAIN_DS='data/visda2017/train'
 VAL_DS='data/visda2017/val'
 TEST_DS='data/visda2017/test'
 MODE='HP_SEARCH'
-EPOCHS=10
+BATCH_SIZE=256
 
 wandb login $WANDB_API_KEY
 
@@ -17,6 +17,5 @@ python synthnet_vit_finetuning.py \
 --train_ds $TRAIN_DS \
 --val_ds $VAL_DS \
 --test_ds $TEST_DS \
+--batch_size $BATCH_SIZE \
 --mode $MODE \
---num_train_epochs $EPOCHS \
---hps_run_count 20
