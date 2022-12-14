@@ -1,10 +1,10 @@
 #!/bin/bash
-PROJECT_NAME='mi3dor-vit-finetuning'
-OUTPUT_DIR='out/synthnet_finetuning/mi3dor_finetuning/vit'
+PROJECT_NAME='visda2017-vit-finetuning'
+OUTPUT_DIR='out/synthnet_finetuning/synthnet_finetuning/vit'
 
-TRAIN_DS='data/mi3dor/train'
-VAL_DS='data/mi3dor/test'
-TEST_DS='data/mi3dor/test'
+TRAIN_DS='data/visda2017/train'
+VAL_DS='data/visda2017/val'
+TEST_DS='data/visda2017/test'
 
 MODE='FINETUNING'
 EPOCHS=20
