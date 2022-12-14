@@ -135,6 +135,7 @@ def main(**kwargs):
     # - Each filename has to include the split name (e.g.: myname_test, train_my_name, my_val_name)
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
     # Either use given val dataset or else split up training into training + validation
+    # TODO: fix?!
     if args.val_ds:
         val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="validation")
     else:
