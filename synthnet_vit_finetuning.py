@@ -127,14 +127,14 @@ def main(**kwargs):
     # - Ensure format ds_dir/label/filename_SPLIT.png
     # - Each filename has to include the split name (e.g.: myname_test, train_my_name, my_val_name)
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
-    # Either use given val dataset or else split up training into training + validation
+    test_ds = load_dataset("imagefolder", data_dir=args.test_ds, split="test")
+    # Either use given val dataset or else split up test-set into validation and test
     if args.val_ds:
         val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="validation")
     else:
-        splits = train_ds.train_test_split(test_size=0.1)
-        train_ds = splits['train']
-        val_ds = splits['test']
-    test_ds = load_dataset("imagefolder", data_dir=args.test_ds, split="test")
+        splits = test_ds.train_test_split(test_size=0.1, stratify_by_column="label")  # stratify
+        val_ds = splits['train']
+        test_ds = splits['test']
 
     # map ids to labels and vice versa
     id2label = {id: label for id, label in enumerate(train_ds.features['label'].names)}
@@ -197,7 +197,11 @@ def main(**kwargs):
     ###############################################################
 
     num_labels = len(id2label.keys())
-    model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k', num_labels=num_labels, id2label=id2label, label2id=label2id, ignore_mismatched_sizes=True)
+    model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k',
+                                                      num_labels=num_labels,
+                                                      id2label=id2label,
+                                                      label2id=label2id,
+                                                      ignore_mismatched_sizes=True)
 
     def train_finetuning(
         run_name: str,
