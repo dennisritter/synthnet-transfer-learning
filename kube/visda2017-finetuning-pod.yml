@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: visda2017-finetuning
+  name: visda2017-ft-tgs
 spec:
   restartPolicy: Never
   containers:
-  - name: visda2017-finetuning-pod
+  - name: visda2017-ft
     image: beuthdritter/synthnet-finetuning
     env:
     - name: WANDB_API_KEY
