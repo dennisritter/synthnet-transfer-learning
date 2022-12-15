@@ -129,7 +129,7 @@ def main(**kwargs):
     train_ds = load_dataset("imagefolder", data_dir=args.train_ds, split="train")
     # Either use given val dataset or else split up training into training + validation
     if args.val_ds:
-        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="test")
+        val_ds = load_dataset("imagefolder", data_dir=args.val_ds, split="validation")
     else:
         splits = train_ds.train_test_split(test_size=0.1)
         train_ds = splits['train']
@@ -197,7 +197,7 @@ def main(**kwargs):
     ###############################################################
 
     num_labels = len(id2label.keys())
-    model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k', num_labels=num_labels, id2label=id2label, label2id=label2id)
+    model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k', num_labels=num_labels, id2label=id2label, label2id=label2id, ignore_mismatched_sizes=True)
 
     def train_finetuning(
         run_name: str,
@@ -243,6 +243,7 @@ def main(**kwargs):
             warmup_ratio=warmup_ratio,
             optim="adamw_torch",
             fp16=True,
+            dataloader_num_workers=4,
             # adam_beta1=0.9,
             # adam_beta2=0.999,
             # adam_epsilon=1e-8,
