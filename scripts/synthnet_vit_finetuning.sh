@@ -3,21 +3,21 @@ PROJECT_NAME='synthnet-vit-finetuning'
 OUTPUT_DIR='out/synthnet_finetuning/synthnet_finetuning/vit'
 
 TRAIN_DS='data/topex-printer/train'
-VAL_DS='data/topex-printer/test'
+# VAL_DS='data/topex-printer/test'
 TEST_DS='data/topex-printer/test'
 
 MODE='FINETUNING'
-EPOCHS=20
+EPOCHS=50
 BATCH_SIZE=8
-LR=3e-3
-WEIGHT_DECAY=3e-2
+LR=6e-5
+WEIGHT_DECAY=0.01
 WARM_UP_RATIO=0.1
 
 python synthnet_vit_finetuning.py \
 --project_name $PROJECT_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
---val_ds $VAL_DS \
+# --val_ds $VAL_DS \
 --test_ds $TEST_DS \
 --batch_size $BATCH_SIZE \
 --mode $MODE \

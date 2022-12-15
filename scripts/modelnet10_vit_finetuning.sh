@@ -8,9 +8,9 @@ TEST_DS='data/modelnet10/test'
 
 MODE='FINETUNING'
 EPOCHS=20
-BATCH_SIZE=8
-LR=3e-3
-WEIGHT_DECAY=3e-2
+BATCH_SIZE=16
+LR=6e-5
+WEIGHT_DECAY=0.01
 WARM_UP_RATIO=0.1
 
 python synthnet_vit_finetuning.py \
