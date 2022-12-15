@@ -1,3 +1,4 @@
+"""finteune vit"""
 from types import SimpleNamespace
 import random
 import numpy as np
@@ -5,7 +6,17 @@ from datasets import load_dataset
 from transformers import ViTFeatureExtractor, ViTForImageClassification, TrainingArguments, Trainer, logging
 import evaluate
 import torch
-from torchvision.transforms import (RandAugment, CenterCrop, Compose, Normalize, RandomHorizontalFlip, RandomVerticalFlip, Resize, ToTensor)
+from torchvision.transforms import (
+    RandAugment,
+    CenterCrop,
+    Compose,
+    Normalize,
+    RandomHorizontalFlip,
+    RandomVerticalFlip,
+    Resize,
+    ToTensor,
+    AugMix,
+)
 # from PIL import Image
 import click
 import wandb
@@ -122,6 +133,13 @@ import wandb
     show_default=True,
     default=4,
 )
+@click.option(
+    '--augmix',
+    help='Number of workers for dataloader',
+    type=bool,
+    show_default=True,
+    default=True,
+)
 def main(**kwargs):
     # Parse click parameters and load config
     args = SimpleNamespace(**kwargs)
@@ -159,15 +177,18 @@ def main(**kwargs):
     # Define Transforms
     normalize = Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std)
     # NOTE: type(feature_extractor.size) changes from INT to DICT (transformers 4.24 -> 4.25)
-    _train_transforms = Compose([
-        Resize(feature_extractor.size),
-        CenterCrop(feature_extractor.size),
-        RandAugment(),
-        RandomHorizontalFlip(),
-        RandomVerticalFlip(),
-        ToTensor(),
-        normalize,
-    ])
+    _train_transforms = Compose(
+        [
+            Resize(feature_extractor.size),
+            CenterCrop(feature_extractor.size),
+            AugMix(),
+            RandAugment(),
+            RandomHorizontalFlip(),
+            RandomVerticalFlip(),
+            ToTensor(),
+            normalize,
+        ]
+    )
 
     _val_transforms = Compose([
         Resize(feature_extractor.size),
@@ -201,7 +222,7 @@ def main(**kwargs):
     # f1 = evaluate.load("f1", average="micro")
 
     # metrics = evaluate.combine([accuracy, precision, recall, f1], average="micro")
-    metrics = evaluate.combine(['accuracy'])
+    metrics = evaluate.combine([accuracy])
 
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
@@ -213,11 +234,13 @@ def main(**kwargs):
     ###############################################################
 
     num_labels = len(id2label.keys())
-    model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224-in21k',
-                                                      num_labels=num_labels,
-                                                      id2label=id2label,
-                                                      label2id=label2id,
-                                                      ignore_mismatched_sizes=True)
+    model = ViTForImageClassification.from_pretrained(
+        'google/vit-base-patch16-224-in21k',
+        num_labels=num_labels,
+        id2label=id2label,
+        label2id=label2id,
+        ignore_mismatched_sizes=True,
+    )
 
     def train_finetuning(
         run_name: str,
@@ -242,16 +265,18 @@ def main(**kwargs):
         wandb.log({"train_examples": [wandb.Image(img) for img in train_ds.shuffle()[:5]['image']]})
         wandb.log({"val_examples": [wandb.Image(img) for img in val_ds.shuffle()[:5]['image']]})
         wandb.log({"test_examples": [wandb.Image(img) for img in test_ds.shuffle()[:5]['image']]})
-        wandb.config.update({
-            "datasets": {
-                "train_ds": args.train_ds,
-                "train_ds_samples": train_ds.num_rows,
-                "val_ds": args.val_ds or args.train_ds,
-                "val_ds_samples": val_ds.num_rows,
-                "test_ds": args.test_ds,
-                "test_ds_samples": test_ds.num_rows,
+        wandb.config.update(
+            {
+                "datasets": {
+                    "train_ds": args.train_ds,
+                    "train_ds_samples": train_ds.num_rows,
+                    "val_ds": args.val_ds or args.train_ds,
+                    "val_ds_samples": val_ds.num_rows,
+                    "test_ds": args.test_ds,
+                    "test_ds_samples": test_ds.num_rows,
+                }
             }
-        })
+        )
         training_args = TrainingArguments(
             # run_name=run_name,
             output_dir=f"{output_dir}/{wandb.run.name}",
@@ -293,9 +318,10 @@ def main(**kwargs):
         )
         trainer.train(resume_from_checkpoint=args.resume)
         outputs = trainer.predict(test_ds)
-        logits = outputs.predictions
         wandb.log(outputs.metrics)
 
+        # log PR ROC_AUC CONFMAT -> Wandb lags
+        # logits = outputs.predictions
         # predictions = np.argmax(logits, axis=-1)
         # ground_truth = np.array([sample['label'] for sample in test_ds])
         # wandb.log({"pr_curve": wandb.plot.pr_curve(
@@ -402,7 +428,7 @@ def main(**kwargs):
                 },
                 'weight_decay': {
                     'value': 0.03,
-                },
+                }
             }
         }
         sweep_id = wandb.sweep(sweep=sweep_config, project=args.project_name)
