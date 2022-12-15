@@ -24,3 +24,5 @@ python synthnet_vit_finetuning.py \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO
+--grayscale True
+--augmix False

@@ -7,6 +7,7 @@ from transformers import ViTFeatureExtractor, ViTForImageClassification, Trainin
 import evaluate
 import torch
 from torchvision.transforms import (
+    RandomApply,
     RandAugment,
     CenterCrop,
     Compose,
@@ -15,6 +16,7 @@ from torchvision.transforms import (
     RandomVerticalFlip,
     Resize,
     ToTensor,
+    Grayscale,
     AugMix,
 )
 # from PIL import Image
@@ -134,8 +136,15 @@ import wandb
     default=4,
 )
 @click.option(
+    '--grayscale',
+    help='use grayscale transform for train and test loader',
+    type=bool,
+    show_default=True,
+    default=True,
+)
+@click.option(
     '--augmix',
-    help='Number of workers for dataloader',
+    help='use grayscale transform for train loader',
     type=bool,
     show_default=True,
     default=True,
@@ -144,6 +153,7 @@ def main(**kwargs):
     # Parse click parameters and load config
     args = SimpleNamespace(**kwargs)
     random.seed(args.seed)
+    torch.manual_seed(args.seed)
     wandb.login()
     logging.set_verbosity_error()
     ###############################################################
@@ -175,27 +185,30 @@ def main(**kwargs):
     # load huggingface feature extractor to prepare data for the model
     feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
     # Define Transforms
-    normalize = Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std)
     # NOTE: type(feature_extractor.size) changes from INT to DICT (transformers 4.24 -> 4.25)
     _train_transforms = Compose(
         [
             Resize(feature_extractor.size),
             CenterCrop(feature_extractor.size),
-            AugMix(),
-            RandAugment(),
             RandomHorizontalFlip(),
             RandomVerticalFlip(),
+            RandomApply([AugMix()], p=int(args.augmix)),
+            RandAugment(),
+            RandomApply([Grayscale(3)], p=int(args.grayscale)),
             ToTensor(),
-            normalize,
+            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
         ]
     )
 
-    _val_transforms = Compose([
-        Resize(feature_extractor.size),
-        CenterCrop(feature_extractor.size),
-        ToTensor(),
-        normalize,
-    ])
+    _val_transforms = Compose(
+        [
+            Resize(feature_extractor.size),
+            CenterCrop(feature_extractor.size),
+            RandomApply([Grayscale(3)], p=int(args.grayscale)),
+            ToTensor(),
+            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+        ]
+    )
 
     def train_transforms(examples):
         examples['pixel_values'] = [_train_transforms(image.convert("RGB")) for image in examples['image']]
