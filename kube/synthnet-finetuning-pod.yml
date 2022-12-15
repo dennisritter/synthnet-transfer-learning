@@ -30,7 +30,7 @@ spec:
         memory: "32Gi"
         cpu: "32"
   nodeSelector:
-    gpu: a100
+    gpu: v100
   volumes:
   - name: synthnet-finetuning-volume 
     persistentVolumeClaim:
