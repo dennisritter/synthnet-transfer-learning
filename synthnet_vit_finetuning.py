@@ -1,7 +1,8 @@
 from types import SimpleNamespace
+import random
 import numpy as np
 from datasets import load_dataset
-from transformers import ViTFeatureExtractor, ViTForImageClassification, TrainingArguments, Trainer
+from transformers import ViTFeatureExtractor, ViTForImageClassification, TrainingArguments, Trainer, logging
 import evaluate
 import torch
 from torchvision.transforms import (RandAugment, CenterCrop, Compose, Normalize, RandomHorizontalFlip, RandomVerticalFlip, Resize, ToTensor)
@@ -114,10 +115,19 @@ import wandb
     show_default=True,
     default=0.1,
 )
+@click.option(
+    '--workers',
+    help='Number of workers for dataloader',
+    type=int,
+    show_default=True,
+    default=4,
+)
 def main(**kwargs):
     # Parse click parameters and load config
     args = SimpleNamespace(**kwargs)
+    random.seed(args.seed)
     wandb.login()
+    logging.set_verbosity_error()
     ###############################################################
     ## LOADING DATA
     ###############################################################
@@ -185,12 +195,18 @@ def main(**kwargs):
         return {"pixel_values": pixel_values, "labels": labels}
 
     # define training eval metric
-    metric = evaluate.load("accuracy")
+    accuracy = evaluate.load("accuracy")
+    # precision = evaluate.load("precision", average="micro")
+    # recall = evaluate.load("recall", average="micro")
+    # f1 = evaluate.load("f1", average="micro")
+
+    # metrics = evaluate.combine([accuracy, precision, recall, f1], average="micro")
+    metrics = evaluate.combine(['accuracy'])
 
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
         predictions = np.argmax(predictions, axis=1)
-        return metric.compute(predictions=predictions, references=labels)
+        return metrics.compute(predictions=predictions, references=labels)
 
     ###############################################################
     ## DEFINE MODEL AND TRAINING CONFIGURATIONS
@@ -222,6 +238,10 @@ def main(**kwargs):
             wandb.init(project=args.project_name)
         if run_name:
             wandb.run.name = run_name
+
+        wandb.log({"train_examples": [wandb.Image(img) for img in train_ds.shuffle()[:5]['image']]})
+        wandb.log({"val_examples": [wandb.Image(img) for img in val_ds.shuffle()[:5]['image']]})
+        wandb.log({"test_examples": [wandb.Image(img) for img in test_ds.shuffle()[:5]['image']]})
         wandb.config.update({
             "datasets": {
                 "train_ds": args.train_ds,
@@ -273,7 +293,30 @@ def main(**kwargs):
         )
         trainer.train(resume_from_checkpoint=args.resume)
         outputs = trainer.predict(test_ds)
+        logits = outputs.predictions
         wandb.log(outputs.metrics)
+
+        # predictions = np.argmax(logits, axis=-1)
+        # ground_truth = np.array([sample['label'] for sample in test_ds])
+        # wandb.log({"pr_curve": wandb.plot.pr_curve(
+        #     ground_truth,
+        #     logits,
+        #     labels=[name for name in label2id.keys()],
+        # )})
+        # wandb.log({"roc_curve": wandb.plot.roc_curve(
+        #     ground_truth,
+        #     logits,
+        #     labels=[name for name in label2id.keys()],
+        # )})
+        # wandb.log({
+        #     "confusion_matrix": wandb.plot.confusion_matrix(
+        #         probs=None,
+        #         y_true=ground_truth,
+        #         preds=predictions,
+        #         class_names=[name for name in label2id.keys()],
+        #     )
+        # })
+
         print(f"{outputs.metrics=}")
 
     # TODO: Fix args
