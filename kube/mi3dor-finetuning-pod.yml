@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: mi3dor-finetuning-pod
+  name: mi3dor-finetuning
 spec:
   restartPolicy: Never
   containers:
-  - name: mi3dor-finetuning-pod
+  - name: mi3dor-finetuning
     image: beuthdritter/synthnet-finetuning
     env:
     - name: WANDB_API_KEY

@@ -17,7 +17,6 @@ python synthnet_vit_finetuning.py \
 --project_name $PROJECT_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
-# --val_ds $VAL_DS \
 --test_ds $TEST_DS \
 --batch_size $BATCH_SIZE \
 --mode $MODE \
