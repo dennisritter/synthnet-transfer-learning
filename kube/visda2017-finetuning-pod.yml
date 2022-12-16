@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: visda2017-ft-gs
+  name: visda2017-ft-augmix
 spec:
   restartPolicy: Never
   containers:

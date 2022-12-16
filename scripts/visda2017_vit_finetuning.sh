@@ -1,6 +1,6 @@
 #!/bin/bash
 PROJECT_NAME='visda2017-vit-finetuning'
-RUN_NAME='vitb16_gs'
+RUN_NAME='vitb16_augmix'
 OUTPUT_DIR='out/synthnet_finetuning/synthnet_finetuning/vit'
 
 TRAIN_DS='data/visda2017/train'
@@ -26,5 +26,5 @@ python synthnet_vit_finetuning.py \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
---grayscale True \
---augmix False
+--grayscale False \
+--augmix True

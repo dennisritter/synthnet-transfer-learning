@@ -220,6 +220,25 @@ def main(**kwargs):
         examples['pixel_values'] = [_val_transforms(image.convert("RGB")) for image in examples['image']]
         return examples
 
+    class UnNormalize(object):
+
+        def __init__(self, mean, std):
+            self.mean = mean
+            self.std = std
+
+        def __call__(self, tensor):
+            """
+            Args:
+                tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+            Returns:
+                Tensor: Normalized image.
+            """
+            for t, m, s in zip(tensor, self.mean, self.std):
+                t.mul_(s).add_(m)
+                # The normalize code -> t.sub_(m).div_(s)
+            return tensor
+
+    unnormalize = UnNormalize(feature_extractor.image_mean, feature_extractor.image_std)
     # Set the transforms
     train_ds.set_transform(train_transforms)
     val_ds.set_transform(val_transforms)
@@ -277,9 +296,9 @@ def main(**kwargs):
         if run_name:
             wandb.run.name = run_name
 
-        wandb.log({"train_examples": [wandb.Image(transforms.ToPILImage()(img)) for img in train_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
-        wandb.log({"val_examples": [wandb.Image(transforms.ToPILImage()(img)) for img in val_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
-        wandb.log({"test_examples": [wandb.Image(transforms.ToPILImage()(img)) for img in test_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
+        wandb.log({"train_examples": [wandb.Image(transforms.ToPILImage()(unnormalize(img))) for img in train_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
+        wandb.log({"val_examples": [wandb.Image(transforms.ToPILImage()(unnormalize(img))) for img in val_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
+        wandb.log({"test_examples": [wandb.Image(transforms.ToPILImage()(unnormalize(img))) for img in test_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
         wandb.config.update(
             {
                 "datasets": {
