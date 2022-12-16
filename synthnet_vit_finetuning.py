@@ -277,9 +277,9 @@ def main(**kwargs):
         if run_name:
             wandb.run.name = run_name
 
-        wandb.log({"train_examples": [wandb.Image(img) for img in transforms.ToPILImage()(train_ds.shuffle(seed=args.seed)[:5]['pixel_values'])]})
-        wandb.log({"val_examples": [wandb.Image(img) for img in transforms.ToPILImage()(val_ds.shuffle(seed=args.seed)[:5]['pixel_values'])]})
-        wandb.log({"test_examples": [wandb.Image(img) for img in transforms.ToPILImage()(test_ds.shuffle(seed=args.seed)[:5]['pixel_values'])]})
+        wandb.log({"train_examples": [wandb.Image(transforms.ToPILImage()(img)) for img in train_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
+        wandb.log({"val_examples": [wandb.Image(transforms.ToPILImage()(img)) for img in val_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
+        wandb.log({"test_examples": [wandb.Image(transforms.ToPILImage()(img)) for img in test_ds.shuffle(seed=args.seed)[:5]['pixel_values']]})
         wandb.config.update(
             {
                 "datasets": {
