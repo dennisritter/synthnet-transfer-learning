@@ -1,8 +1,8 @@
 # Base Image
-FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
+FROM pytorch/pytorch:1.13.1-cuda11.6-cudnn8-devel
 
 RUN rm /etc/apt/sources.list.d/cuda.list
-RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+# RUN rm /etc/apt/sources.list.d/nvidia-ml.list
 
 # Install dependencies
 RUN apt update && \
