@@ -15,6 +15,7 @@ WEIGHT_DECAY=0.1
 WARM_UP_RATIO=0.1
 
 python synthnet_vit_finetuning.py \
+--model 'google/vit-base-patch16-224-in21k'
 --project_name $PROJECT_NAME \
 --run_name $RUN_NAME \
 --output_dir $OUTPUT_DIR \
