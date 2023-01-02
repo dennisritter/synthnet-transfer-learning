@@ -14,8 +14,7 @@ RUN apt update && \
     pip install wandb \
     pip install scikit-learn
 
-RUN apt install git
-
+RUN apt-get -y install git
 
 # # Change working directory
 # WORKDIR /workspace

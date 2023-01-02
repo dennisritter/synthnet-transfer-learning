@@ -17,6 +17,7 @@ WARM_UP_RATIO=0.1
 WORKERS=4
 
 python synthnet_vit_finetuning.py \
+--model "google/vit-base-patch16-224-in21k" \
 --project_name $PROJECT_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \

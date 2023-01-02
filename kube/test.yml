@@ -37,18 +37,12 @@ spec:
       [
         "/bin/bash",
         "-c",
-        "cd",
-        "src-pv/feature-extractor-finetuning;",
-        "git",
-        "pull;",
-        "cd",
-        "../..;",
-        "cp",
-        "-r",
-        "src-pv/feature-extractor-finetuning",
-        ".;",
-        "bash",
-        "scripts/_test.sh;" ,
+        "while true; do sleep 30; done;",
+        "cd /src-pv/feature-extractor-finetuning;",
+        "git pull;",
+        "cd /workspace;"
+        "cp -r /src-pv/feature-extractor-finetuning/* /workspace;",
+        "bash scripts/_test.sh" ,
       ]
     resources:
       limits:
