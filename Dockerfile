@@ -14,10 +14,13 @@ RUN apt update && \
     pip install wandb \
     pip install scikit-learn
 
-# Change working directory
-WORKDIR /workspace
-# Copy project files into workspace
-COPY . .
+RUN apt install git
+
+
+# # Change working directory
+# WORKDIR /workspace
+# # Copy project files into workspace
+# COPY . .
 
 
 # ENV PYTHONPATH "${PYTHONPATH}:/workspace"
