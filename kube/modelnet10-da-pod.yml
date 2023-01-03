@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: modelnet10-resnet-da
+  name: modelnet10-resnet-da-augmix
 spec:
   restartPolicy: Never
   containers:
