@@ -24,14 +24,14 @@ from modules.training import train_finetuning
 
 @click.command()
 @click.option(
-    '--project_name',
-    help="Project name this run belongs to. (WandB Project)",
+    '--model',
+    help="The model to use. Either a Huggingface model name or path to local model checkpoint directory.",
     type=str,
     required=True,
 )
 @click.option(
-    '--model',
-    help="The model to use. Either a Huggingface model name or path to local model checkpoint directory.",
+    '--project_name',
+    help="Project name this run belongs to. (WandB Project)",
     type=str,
     required=True,
 )
