@@ -2,7 +2,7 @@
 DATASET="visda2017"
 
 PROJECT_NAME="${DATASET}_DA"
-RUN_NAME="resnet_in1k"
+RUN_NAME="resnet_in1k_augmix_lp"
 OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
@@ -23,7 +23,7 @@ python synthnet_vit_finetuning.py \
 --val_ds $VAL_DS \
 --test_ds $TEST_DS \
 --run_name $RUN_NAME \
---train_layers "FULL" \
+--train_layers "CLASS_HEAD" \
 --seed 42 \
 --batch_size $BATCH_SIZE \
 --num_train_epochs $EPOCHS \
