@@ -2,7 +2,7 @@
 DATASET="modelnet10"
 
 PROJECT_NAME="${DATASET}_DA"
-RUN_NAME="vitb16_in21k"
+RUN_NAME="vitb16_in21k_lp"
 OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
@@ -22,7 +22,7 @@ python synthnet_vit_finetuning.py \
 --train_ds $TRAIN_DS \
 --test_ds $TEST_DS \
 --run_name $RUN_NAME \
---train_layers "FULL" \
+--train_layers "CLASS_HEAD" \
 --seed 42 \
 --batch_size $BATCH_SIZE \
 --num_train_epochs $EPOCHS \
