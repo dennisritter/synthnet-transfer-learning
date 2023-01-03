@@ -1,33 +1,34 @@
 #!/bin/bash
-DATASET="topex-printer"
+DATASET="visda2017"
 
-PROJECT_NAME='test'
-OUTPUT_DIR='out/synthnet_finetuning/synthnet_finetuning/test'
+PROJECT_NAME="test"
+RUN_NAME="test_resnet50_in1k"
+OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
-# VAL_DS='data/topex-printer/test'
+VAL_DS="data/${DATASET}/val"
 TEST_DS="data/${DATASET}/test"
 
-MODE='FINETUNING'
-EPOCHS=1
-BATCH_SIZE=8
-LR=6e-5
-WEIGHT_DECAY=0.01
+EPOCHS=5
+BATCH_SIZE=16
+LR=1e-4
+WEIGHT_DECAY=0.1
 WARM_UP_RATIO=0.1
-WORKERS=4
 
 python synthnet_vit_finetuning.py \
---model "google/vit-base-patch16-224-in21k" \
+--model "microsoft/resnet-50" \
 --project_name $PROJECT_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
+--val_ds $VAL_DS \
 --test_ds $TEST_DS \
+--run_name $RUN_NAME \
+--train_layers "FULL" \
+--seed 42 \
 --batch_size $BATCH_SIZE \
---mode $MODE \
 --num_train_epochs $EPOCHS \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
---workers $WORKERS \
---grayscale False \
+--workers 8 \
 --augmix True

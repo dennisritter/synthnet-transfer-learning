@@ -40,16 +40,18 @@ spec:
       ]
     args:
       - cd /src-pv/feature-extractor-finetuning;
+        git checkout develop;
         git pull;
         cd /workspace;
         cp -r /src-pv/feature-extractor-finetuning/* /workspace;
         bash scripts/_test.sh;
-        while true; do sleep 30; done;
     resources:
       limits:
         nvidia.com/gpu: 1
         memory: "32Gi"
         cpu: "32"
+  nodeSelector:
+    gpu: a100
   volumes:
   - name: synthnet-finetuning-volume 
     persistentVolumeClaim:
