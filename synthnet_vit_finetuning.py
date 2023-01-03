@@ -13,7 +13,6 @@ from torchvision.transforms import (
     RandomVerticalFlip,
     Resize,
     ToTensor,
-    Grayscale,
     AugMix,
 )
 # from PIL import Image
@@ -32,7 +31,7 @@ from modules.training import train_finetuning
 )
 @click.option(
     '--model',
-    help="The model to use",
+    help="The model to use. Either a Huggingface model name or path to local model checkpoint directory.",
     type=str,
     required=True,
 )
@@ -66,15 +65,10 @@ from modules.training import train_finetuning
     required=False,
 )
 @click.option(
-    '--mode',
-    help="Either HP_Search or Finetuning mode.",
-    type=click.Choice(['HP_SEARCH', 'FINETUNING']),
-    required=False,
-)
-@click.option(
-    '--checkpoint',
-    help="Path to a pretrained checkpoint to load.",
-    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    '--train_layers',
+    help="Which layers to train. Accepts a predefined choice of strings for implemented configurations.",
+    type=click.Choice(['FULL', 'CLASS_HEAD']),
+    default='full',
     required=False,
 )
 @click.option(
@@ -141,13 +135,6 @@ from modules.training import train_finetuning
     default=4,
 )
 @click.option(
-    '--grayscale',
-    help='use grayscale transform for train and test loader',
-    type=bool,
-    show_default=True,
-    default=False,
-)
-@click.option(
     '--augmix',
     help='use grayscale transform for train loader',
     type=bool,
@@ -176,28 +163,22 @@ def main(**kwargs):
 
     # Define Transforms
     # NOTE: type(feature_extractor.size) changes from INT to DICT (transformers 4.24 -> 4.25)
-    _train_transforms = Compose(
-        [
-            Resize(feature_extractor.size),
-            CenterCrop(feature_extractor.size),
-            RandomHorizontalFlip(),
-            RandomVerticalFlip(),
-            RandomApply([AugMix()], p=int(args.augmix)),
-            RandAugment(),
-            RandomApply([Grayscale(3)], p=int(args.grayscale)),
-            ToTensor(),
-            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
-        ]
-    )
-    _val_transforms = Compose(
-        [
-            Resize(feature_extractor.size),
-            CenterCrop(feature_extractor.size),
-            RandomApply([Grayscale(3)], p=int(args.grayscale)),
-            ToTensor(),
-            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
-        ]
-    )
+    _train_transforms = Compose([
+        Resize(feature_extractor.size),
+        CenterCrop(feature_extractor.size),
+        RandomHorizontalFlip(),
+        RandomVerticalFlip(),
+        RandomApply([AugMix()], p=int(args.augmix)),
+        RandAugment(),
+        ToTensor(),
+        Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+    ])
+    _val_transforms = Compose([
+        Resize(feature_extractor.size),
+        CenterCrop(feature_extractor.size),
+        ToTensor(),
+        Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+    ])
 
     def train_transforms(examples):
         examples['pixel_values'] = [_train_transforms(image.convert("RGB")) for image in examples['image']]
@@ -218,6 +199,7 @@ def main(**kwargs):
     id2label = {id: label for id, label in enumerate(train_ds.features['label'].names)}
     label2id = {label: id for id, label in id2label.items()}
     num_labels = len(id2label.keys())
+
     model = AutoModelForImageClassification.from_pretrained(
         args.model,
         num_labels=num_labels,
@@ -226,52 +208,31 @@ def main(**kwargs):
         ignore_mismatched_sizes=True,
     )
 
-    if args.mode == "FINETUNING":
-        train_finetuning(
-            model=model,
-            feature_extractor=feature_extractor,
-            train_ds=train_ds,
-            val_ds=val_ds,
-            test_ds=test_ds,
-            project_name=args.project_name,
-            run_name=args.run_name,
-            output_dir=args.output_dir,
-            seed=args.seed,
-            per_device_train_batch_size=args.batch_size,
-            per_device_eval_batch_size=args.batch_size,
-            num_train_epochs=args.num_train_epochs,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
-            warmup_ratio=args.warmup_ratio,
-            resume_id=args.resume_id,
-            resume=args.resume,
-        )
+    if args.train_layers == "CLASS_HEAD":
+        for name, param in model.named_parameters():
+            param.requires_grad = False
+        model.classifier.weight.requires_grad = True
+        model.classifier.bias.requires_grad = True
 
-    # # TODO: fix sweep config
-    # if args.mode == "HPS":
-    #     sweep_config = {
-    #         'method': 'grid',
-    #         'metric': {
-    #             'name': 'eval/accuracy',
-    #             'goal': 'maximize'
-    #         },
-    #         'parameters': {
-    #             'steps_total_warmup': {
-    #                 'values': [(2000, 200)]
-    #             },
-    #             'batch_size': {
-    #                 'value': args.batch_size
-    #             },
-    #             'learning_rate': {
-    #                 'values': [1e-3, 3e-3, 0.01],
-    #             },
-    #             'weight_decay': {
-    #                 'value': 0.03,
-    #             }
-    #         }
-    #     }
-    #     sweep_id = wandb.sweep(sweep=sweep_config, project=args.project_name)
-    #     wandb.agent(sweep_id, train_hyperparam_search)
+    train_finetuning(
+        model=model,
+        feature_extractor=feature_extractor,
+        train_ds=train_ds,
+        val_ds=val_ds,
+        test_ds=test_ds,
+        project_name=args.project_name,
+        run_name=args.run_name,
+        output_dir=args.output_dir,
+        seed=args.seed,
+        per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=args.batch_size,
+        num_train_epochs=args.num_train_epochs,
+        learning_rate=args.learning_rate,
+        weight_decay=args.weight_decay,
+        warmup_ratio=args.warmup_ratio,
+        resume_id=args.resume_id,
+        resume=args.resume,
+    )
 
 
 if __name__ == "__main__":
