@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: modelnet10-vit-da-lp
+  name: modelnet10-vit-da-augmix-lp
 spec:
   restartPolicy: Never
   containers:
