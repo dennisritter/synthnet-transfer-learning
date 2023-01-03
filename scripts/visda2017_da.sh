@@ -9,7 +9,6 @@ TRAIN_DS="data/${DATASET}/train"
 VAL_DS="data/${DATASET}/val"
 TEST_DS="data/${DATASET}/test"
 
-MODE="FINETUNING"
 EPOCHS=20
 BATCH_SIZE=16
 LR=3e-5
@@ -19,15 +18,17 @@ WARM_UP_RATIO=0.1
 python synthnet_vit_finetuning.py \
 --model "google/vit-base-patch16-224-in21k" \
 --project_name $PROJECT_NAME \
---run_name $RUN_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
+--val_ds $VAL_DS \
 --test_ds $TEST_DS \
+--run_name $RUN_NAME \
+--train_layers "full" \
+--seed 42 \
 --batch_size $BATCH_SIZE \
---mode $MODE \
 --num_train_epochs $EPOCHS \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
---grayscale False \
+--workers 8 \
 --augmix True
