@@ -31,4 +31,4 @@ python synthnet_vit_finetuning.py \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
 --workers 8 \
---augmix False
+--augmix True
