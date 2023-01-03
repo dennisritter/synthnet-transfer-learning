@@ -2,7 +2,7 @@
 DATASET="visda2017"
 
 PROJECT_NAME="${DATASET}_DA"
-RUN_NAME="resnet_in1k_lp"
+RUN_NAME="resnet_in1k_augmix"
 OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
@@ -23,7 +23,7 @@ python synthnet_vit_finetuning.py \
 --val_ds $VAL_DS \
 --test_ds $TEST_DS \
 --run_name $RUN_NAME \
---train_layers "CLASS_HEAD" \
+--train_layers "Full" \
 --seed 42 \
 --batch_size $BATCH_SIZE \
 --num_train_epochs $EPOCHS \
@@ -31,4 +31,4 @@ python synthnet_vit_finetuning.py \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
 --workers 8 \
---augmix False
+--augmix True
