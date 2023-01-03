@@ -35,9 +35,15 @@ spec:
               mountPath: /src-pv
     command:
       [
-        "bash",
-        "scripts/visda2017_da.sh" ,
+        "/bin/bash",
+        "-c",
       ]
+    args:
+      - cd /src-pv/feature-extractor-finetuning;
+        git pull;
+        cd /workspace;
+        cp -r /src-pv/feature-extractor-finetuning/* /workspace;
+        bash scripts/visda2017_da.sh;
     resources:
       limits:
         nvidia.com/gpu: 1
