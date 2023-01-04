@@ -2,11 +2,10 @@
 DATASET="modelnet10"
 
 PROJECT_NAME="${DATASET}_DA"
-RUN_NAME="resnet_in1k_augmix"
+RUN_NAME="vitb16_in21k"
 OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
-# VAL_DS="data/${DATASET}/val"
 TEST_DS="data/${DATASET}/test"
 
 EPOCHS=20
@@ -16,7 +15,7 @@ WEIGHT_DECAY=0.1
 WARM_UP_RATIO=0.1
 
 python synthnet_vit_finetuning.py \
---model "microsoft/resnet-50" \
+--model "google/vit-base-patch16-224-in21k" \
 --project_name $PROJECT_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
@@ -29,5 +28,5 @@ python synthnet_vit_finetuning.py \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
---workers 8 \
---augmix True
+--workers 4 \
+--augmix False
