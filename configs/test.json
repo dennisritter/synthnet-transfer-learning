@@ -1,0 +1,6 @@
+{
+    "dataset": "visda2017",
+    "project_name": "test",
+    "run_name": "test_vit_in21k",
+    "output_dir": "out/synthnet_finetuning/"
+}

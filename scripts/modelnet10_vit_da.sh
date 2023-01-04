@@ -2,7 +2,7 @@
 DATASET="modelnet10"
 
 PROJECT_NAME="${DATASET}_DA"
-RUN_NAME="vitb16_in21k_augmix_lp"
+RUN_NAME="vitb16_in21k_lp"
 OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
@@ -29,5 +29,5 @@ python synthnet_vit_finetuning.py \
 --learning_rate $LR \
 --weight_decay $WEIGHT_DECAY \
 --warmup_ratio $WARM_UP_RATIO \
---workers 8 \
---augmix True
+--workers 4 \
+--augmix False
