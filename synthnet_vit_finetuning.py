@@ -167,9 +167,7 @@ def main(**kwargs):
         Resize(feature_extractor.size),
         CenterCrop(feature_extractor.size),
         RandomHorizontalFlip(),
-        RandomVerticalFlip(),
         RandomApply([AugMix()], p=int(args.augmix)),
-        RandAugment(),
         ToTensor(),
         Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
     ])
