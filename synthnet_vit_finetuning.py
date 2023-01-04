@@ -5,7 +5,6 @@ from transformers import AutoFeatureExtractor, AutoModelForImageClassification, 
 import torch
 from torchvision.transforms import (
     RandomApply,
-    RandAugment,
     CenterCrop,
     Compose,
     Normalize,
