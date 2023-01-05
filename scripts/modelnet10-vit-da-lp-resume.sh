@@ -8,7 +8,7 @@ OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 TRAIN_DS="data/${DATASET}/train"
 TEST_DS="data/${DATASET}/test"
 
-EPOCHS=20
+EPOCHS=40
 BATCH_SIZE=16
 LR=0.1
 WEIGHT_DECAY=0.1

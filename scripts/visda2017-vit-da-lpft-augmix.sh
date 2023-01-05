@@ -2,7 +2,7 @@
 DATASET="visda2017"
 
 PROJECT_NAME="${DATASET}_DA"
-RUN_NAME="visda2017-vit-da-lpft-augmix"
+RUN_NAME="vitb16_in21k_lpft_augmix"
 OUTPUT_DIR="out/synthnet_finetuning/${PROJECT_NAME}"
 
 TRAIN_DS="data/${DATASET}/train"
