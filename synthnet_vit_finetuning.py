@@ -162,20 +162,24 @@ def main(**kwargs):
 
     # Define Transforms
     # NOTE: type(feature_extractor.size) changes from INT to DICT (transformers 4.24 -> 4.25)
-    _train_transforms = Compose([
-        Resize(feature_extractor.size),
-        CenterCrop(feature_extractor.size),
-        RandomHorizontalFlip(),
-        RandomApply([AugMix()], p=int(args.augmix)),
-        ToTensor(),
-        Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
-    ])
-    _val_transforms = Compose([
-        Resize(feature_extractor.size),
-        CenterCrop(feature_extractor.size),
-        ToTensor(),
-        Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
-    ])
+    _train_transforms = Compose(
+        [
+            Resize(feature_extractor.size),
+            CenterCrop(feature_extractor.size),
+            RandomHorizontalFlip(),
+            RandomApply([AugMix()], p=int(args.augmix)),
+            ToTensor(),
+            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+        ]
+    )
+    _val_transforms = Compose(
+        [
+            Resize(feature_extractor.size),
+            CenterCrop(feature_extractor.size),
+            ToTensor(),
+            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+        ]
+    )
 
     def train_transforms(examples):
         examples['pixel_values'] = [_train_transforms(image.convert("RGB")) for image in examples['image']]
@@ -205,6 +209,9 @@ def main(**kwargs):
         ignore_mismatched_sizes=True,
     )
 
+    if args.train_layers == "FULL":
+        for name, param in model.named_parameters():
+            param.requires_grad = True
     if args.train_layers == "CLASS_HEAD":
         for name, param in model.named_parameters():
             param.requires_grad = False
