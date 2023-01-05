@@ -12,7 +12,7 @@ EPOCHS=40
 BATCH_SIZE=16
 LR=0.1
 WEIGHT_DECAY=0.1
-WARM_UP_RATIO=0.1
+WARM_UP_RATIO=0.0
 
 python synthnet_vit_finetuning.py \
 --model "out/synthnet_finetuning/modelnet10_DA/vitb16_in21k_lp/checkpoint-159640" \
