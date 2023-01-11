@@ -15,7 +15,7 @@ WEIGHT_DECAY=0.1
 WARM_UP_RATIO=0.1
 
 python synthnet_vit_finetuning.py \
---model "google/vit-base-patch16-224-in21k" \
+--model "data/checkpoints/modelnet10meshgrid/vit-da-lp-step5000" \
 --project_name $PROJECT_NAME \
 --output_dir $OUTPUT_DIR \
 --train_ds $TRAIN_DS \
