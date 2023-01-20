@@ -2,8 +2,8 @@
 
 import lightning as pl
 
-from datamodules.baseline_finetune_dm import BaselineFinetuneDM
-from datamodules.generic_finetune_dm import GenericFinetuneDM
+from data.baseline_finetune_dm import BaselineFinetuneDM
+from data.generic_finetune_dm import GenericFinetuneDM
 
 pl.seed_everything(0)
 dm = GenericFinetuneDM(
