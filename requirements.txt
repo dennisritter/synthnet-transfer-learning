@@ -1,7 +1,17 @@
-numpy 
 transformers 
 datasets 
-evaluate 
-click 
-wandb 
-scikit-learn
+evaluate
+
+numpy 
+scikit-learn    
+lightning       # pytorch lightning
+# --- logging ---
+wandb
+# --- other ---
+pyrootutils     # standardizing the project root setup
+pre-commit      # hooks for applying linters on commit
+rich            # beautiful text formatting in terminal
+black
+
+# --- personal/optional ---
+# jupyter_contrib_nbextensions
