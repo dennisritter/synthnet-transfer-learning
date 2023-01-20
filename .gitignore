@@ -143,9 +143,8 @@ __MACOSX
 .vscode/
 
 *.zip
-data
+./data/**
 out
 wandb
 logs
-vit-sweeps
 outputs
