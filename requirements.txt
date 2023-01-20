@@ -4,16 +4,20 @@ evaluate
 
 numpy
 scikit-learn
-lightning       # pytorch lightning
-# --- logging ---
+pytorch-lightning       # pytorch lightning
+# --- config & logging ---
 wandb
+omegaconf
+hydra-core
+hydra-colorlog
 # --- other ---
 pyrootutils     # standardizing the project root setup
 pre-commit      # hooks for applying linters on commit
 rich            # beautiful text formatting in terminal
-black
-flake8
-isort
+black           # Python code formatter
+flake8          # python linter
+isort           # sort python imports
+pyrootutils     # solve problems with pythonpath, working directory, file paths, module imports and environment variables
 
 # --- personal/optional ---
 # jupyter_contrib_nbextensions
