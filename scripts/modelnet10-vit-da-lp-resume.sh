@@ -31,4 +31,4 @@ python synthnet_vit_finetuning.py \
 --workers 4 \
 --augmix False \
 --resume_id 3j4fpdmy \
---resume True 
+--resume True

@@ -1,10 +1,9 @@
-""" A generic DataModule for fine-tuning.
-"""
+"""A generic DataModule for fine-tuning."""
 
-from torchvision import transforms
-from torchvision.datasets import ImageFolder
 import lightning as pl
 from torch.utils.data import DataLoader, random_split
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 class GenericFinetuneDM(pl.LightningDataModule):
@@ -44,20 +43,12 @@ class GenericFinetuneDM(pl.LightningDataModule):
                     [transforms.RandomHorizontalFlip()],
                     p=int(self.random_horizontal_flip),
                 ),
+                transforms.RandomApply([transforms.RandomVerticalFlip()], p=int(self.random_vertical_flip)),
                 transforms.RandomApply(
-                    [transforms.RandomVerticalFlip()], p=int(self.random_vertical_flip)
-                ),
-                transforms.RandomApply(
-                    [
-                        transforms.ColorJitter(
-                            brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3
-                        )
-                    ],
+                    [transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)],
                     p=int(self.random_color_jitter),
                 ),
-                transforms.RandomApply(
-                    [transforms.RandomGrayscale()], p=int(self.random_grayscale)
-                ),
+                transforms.RandomApply([transforms.RandomGrayscale()], p=int(self.random_grayscale)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=self.image_mean, std=self.image_std),
             ]
@@ -100,11 +91,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         )
 
     def val_dataloader(self):
-        return DataLoader(
-            dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers
-        )
+        return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def test_dataloader(self):
-        return DataLoader(
-            dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers
-        )
+        return DataLoader(dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers)

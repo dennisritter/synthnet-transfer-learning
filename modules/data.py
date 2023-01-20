@@ -1,10 +1,10 @@
-""" Collection of classes and functions related to Classification data. """
+"""Collection of classes and functions related to Classification data."""
 
-from datasets import load_dataset
 import torch
+from datasets import load_dataset
 
 
-class UnNormalize(object):
+class UnNormalize:
     """Undo normalize transform."""
 
     def __init__(self, mean, std):
@@ -47,9 +47,7 @@ def train_val_test_imagefolder(train_dir: str, val_dir: str, test_dir: str):
     if val_dir:
         val_ds = load_dataset("imagefolder", data_dir=val_dir, split="validation")
     else:
-        splits = test_ds.train_test_split(
-            test_size=0.1, stratify_by_column="label"
-        )  # stratify
+        splits = test_ds.train_test_split(test_size=0.1, stratify_by_column="label")  # stratify
         val_ds = splits["train"]
         test_ds = splits["test"]
 
@@ -57,7 +55,7 @@ def train_val_test_imagefolder(train_dir: str, val_dir: str, test_dir: str):
 
 
 def collate_fn(examples):
-    """Data Collator for Huggingface image classification Dataset
+    """Data Collator for Huggingface image classification Dataset.
 
     Args:
         examples (dict): A batch of data samples

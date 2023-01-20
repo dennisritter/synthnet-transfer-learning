@@ -1,6 +1,7 @@
-""" The main run script."""
+"""The main run script."""
 
 import lightning as pl
+
 from datamodules.baseline_finetune_dm import BaselineFinetuneDM
 from datamodules.generic_finetune_dm import GenericFinetuneDM
 

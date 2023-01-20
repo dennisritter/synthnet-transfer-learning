@@ -1,7 +1,8 @@
 import os
 import shutil
-import click
 from types import SimpleNamespace
+
+import click
 
 
 @click.command()

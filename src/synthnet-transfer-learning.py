@@ -1,28 +1,29 @@
-"""finteune vit"""
-from types import SimpleNamespace
+"""finteune vit."""
 import random
-from transformers import (
-    AutoFeatureExtractor,
-    AutoModelForImageClassification,
-    set_seed,
-    logging,
-)
+from types import SimpleNamespace
+
+# from PIL import Image
+import click
 import torch
+import wandb
 from torchvision.transforms import (
-    RandomApply,
+    AugMix,
     CenterCrop,
     Compose,
     Normalize,
+    RandomApply,
     RandomHorizontalFlip,
     RandomVerticalFlip,
     Resize,
     ToTensor,
-    AugMix,
+)
+from transformers import (
+    AutoFeatureExtractor,
+    AutoModelForImageClassification,
+    logging,
+    set_seed,
 )
 
-# from PIL import Image
-import click
-import wandb
 from modules.data import train_val_test_imagefolder
 from modules.training import train_finetuning
 
@@ -175,9 +176,7 @@ def main(**kwargs):
             RandomHorizontalFlip(),
             RandomApply([AugMix()], p=int(args.augmix)),
             ToTensor(),
-            Normalize(
-                mean=feature_extractor.image_mean, std=feature_extractor.image_std
-            ),
+            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
         ]
     )
     _val_transforms = Compose(
@@ -185,22 +184,16 @@ def main(**kwargs):
             Resize(feature_extractor.size),
             CenterCrop(feature_extractor.size),
             ToTensor(),
-            Normalize(
-                mean=feature_extractor.image_mean, std=feature_extractor.image_std
-            ),
+            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
         ]
     )
 
     def train_transforms(examples):
-        examples["pixel_values"] = [
-            _train_transforms(image.convert("RGB")) for image in examples["image"]
-        ]
+        examples["pixel_values"] = [_train_transforms(image.convert("RGB")) for image in examples["image"]]
         return examples
 
     def val_transforms(examples):
-        examples["pixel_values"] = [
-            _val_transforms(image.convert("RGB")) for image in examples["image"]
-        ]
+        examples["pixel_values"] = [_val_transforms(image.convert("RGB")) for image in examples["image"]]
         return examples
 
     # Set the transforms

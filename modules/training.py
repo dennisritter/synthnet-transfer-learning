@@ -1,11 +1,12 @@
-"""Defines training functions"""
+"""Defines training functions."""
 
+import evaluate
 import numpy as np
 import torchvision.transforms as transforms
-from transformers import TrainingArguments, Trainer
-import evaluate
 import wandb
-from modules.data import collate_fn, UnNormalize
+from transformers import Trainer, TrainingArguments
+
+from modules.data import UnNormalize, collate_fn
 
 
 def train_finetuning(
