@@ -1,0 +1,6 @@
+{
+  "train_dir": "data/visda2017/train",
+  "test_dir": "data/visda2017/test",
+  "batch_size": 64,
+  "num_workers": 4,
+}
