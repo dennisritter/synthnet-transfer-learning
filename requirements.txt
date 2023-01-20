@@ -1,9 +1,9 @@
-transformers 
-datasets 
+transformers
+datasets
 evaluate
 
-numpy 
-scikit-learn    
+numpy
+scikit-learn
 lightning       # pytorch lightning
 # --- logging ---
 wandb
@@ -12,6 +12,8 @@ pyrootutils     # standardizing the project root setup
 pre-commit      # hooks for applying linters on commit
 rich            # beautiful text formatting in terminal
 black
+flake8
+isort
 
 # --- personal/optional ---
 # jupyter_contrib_nbextensions

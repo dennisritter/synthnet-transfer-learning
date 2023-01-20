@@ -8,7 +8,6 @@ from torch.utils.data import DataLoader, random_split
 
 
 class GenericFinetuneDM(pl.LightningDataModule):
-
     def __init__(
         self,
         train_dir: str = None,
@@ -41,10 +40,24 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.train_transform = transforms.Compose(
             [
                 transforms.RandomResizedCrop(self.image_size, scale=(0.7, 1.0)),
-                transforms.RandomApply([transforms.RandomHorizontalFlip()], p=int(self.random_horizontal_flip)),
-                transforms.RandomApply([transforms.RandomVerticalFlip()], p=int(self.random_vertical_flip)),
-                transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=int(self.random_color_jitter)),
-                transforms.RandomApply([transforms.RandomGrayscale()], p=int(self.random_grayscale)),
+                transforms.RandomApply(
+                    [transforms.RandomHorizontalFlip()],
+                    p=int(self.random_horizontal_flip),
+                ),
+                transforms.RandomApply(
+                    [transforms.RandomVerticalFlip()], p=int(self.random_vertical_flip)
+                ),
+                transforms.RandomApply(
+                    [
+                        transforms.ColorJitter(
+                            brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3
+                        )
+                    ],
+                    p=int(self.random_color_jitter),
+                ),
+                transforms.RandomApply(
+                    [transforms.RandomGrayscale()], p=int(self.random_grayscale)
+                ),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=self.image_mean, std=self.image_std),
             ]
@@ -79,10 +92,19 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.idx2label = {idx: label for label, idx in self.label2idx.items()}
 
     def train_dataloader(self):
-        return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
+        return DataLoader(
+            dataset=self.train,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=True,
+        )
 
     def val_dataloader(self):
-        return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(
+            dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers
+        )
 
     def test_dataloader(self):
-        return DataLoader(dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(
+            dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers
+        )

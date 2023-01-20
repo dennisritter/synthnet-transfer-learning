@@ -1,7 +1,12 @@
 """finteune vit"""
 from types import SimpleNamespace
 import random
-from transformers import AutoFeatureExtractor, AutoModelForImageClassification, set_seed, logging
+from transformers import (
+    AutoFeatureExtractor,
+    AutoModelForImageClassification,
+    set_seed,
+    logging,
+)
 import torch
 from torchvision.transforms import (
     RandomApply,
@@ -14,6 +19,7 @@ from torchvision.transforms import (
     ToTensor,
     AugMix,
 )
+
 # from PIL import Image
 import click
 import wandb
@@ -23,55 +29,55 @@ from modules.training import train_finetuning
 
 @click.command()
 @click.option(
-    '--model',
+    "--model",
     help="The model to use. Either a Huggingface model name or path to local model checkpoint directory.",
     type=str,
     required=True,
 )
 @click.option(
-    '--project_name',
+    "--project_name",
     help="Project name this run belongs to. (WandB Project)",
     type=str,
     required=True,
 )
 @click.option(
-    '--output_dir',
-    help='Output directory path.',
+    "--output_dir",
+    help="Output directory path.",
     type=click.Path(),
     required=True,
 )
 @click.option(
-    '--train_ds',
+    "--train_ds",
     help="Training Dataset in Huggingface imagefolder structure.",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
     required=True,
 )
 @click.option(
-    '--val_ds',
+    "--val_ds",
     help="Validation Dataset in Huggingface imagefolder structure. If no val_ds given, it will be split from the train_ds.",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
 )
 @click.option(
-    '--test_ds',
+    "--test_ds",
     help="Test Dataset in Huggingface imagefolder structure.",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
     required=True,
 )
 @click.option(
-    '--run_name',
+    "--run_name",
     help="Name for this training run.",
     type=str,
     required=False,
 )
 @click.option(
-    '--train_layers',
+    "--train_layers",
     help="Which layers to train. Accepts a predefined choice of strings for implemented configurations.",
-    type=click.Choice(['FULL', 'CLASS_HEAD']),
-    default='full',
+    type=click.Choice(["FULL", "CLASS_HEAD"]),
+    default="full",
     required=False,
 )
 @click.option(
-    '--resume',
+    "--resume",
     help="Do you want to resume a former run?",
     type=bool,
     required=False,
@@ -79,63 +85,63 @@ from modules.training import train_finetuning
     default=False,
 )
 @click.option(
-    '--resume_id',
+    "--resume_id",
     help="WandB run id you want to resume",
     type=str,
     required=False,
 )
 @click.option(
-    '--seed',
-    help='random seed',
+    "--seed",
+    help="random seed",
     type=int,
     show_default=True,
     default=42,
 )
 @click.option(
-    '--batch_size',
-    help='The batch size',
+    "--batch_size",
+    help="The batch size",
     type=int,
     show_default=True,
     default=8,
 )
 @click.option(
-    '--num_train_epochs',
-    help='number of epochs to train',
+    "--num_train_epochs",
+    help="number of epochs to train",
     type=int,
     show_default=True,
     default=20,
 )
 @click.option(
-    '--learning_rate',
-    help='TrainArguments.learning_rate',
+    "--learning_rate",
+    help="TrainArguments.learning_rate",
     type=float,
     show_default=True,
     default=3e-3,
 )
 @click.option(
-    '--weight_decay',
-    help='TrainArguments.weight_decay',
+    "--weight_decay",
+    help="TrainArguments.weight_decay",
     type=float,
     show_default=True,
     default=3e-2,
 )
 @click.option(
-    '--warmup_ratio',
-    help='Warmup steps',
+    "--warmup_ratio",
+    help="Warmup steps",
     type=float,
     show_default=True,
     default=0.1,
 )
 @click.option(
-    '--workers',
-    help='Number of workers for dataloader',
+    "--workers",
+    help="Number of workers for dataloader",
     type=int,
     show_default=True,
     default=4,
 )
 @click.option(
-    '--augmix',
-    help='use grayscale transform for train loader',
+    "--augmix",
+    help="use grayscale transform for train loader",
     type=bool,
     show_default=True,
     default=True,
@@ -169,7 +175,9 @@ def main(**kwargs):
             RandomHorizontalFlip(),
             RandomApply([AugMix()], p=int(args.augmix)),
             ToTensor(),
-            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+            Normalize(
+                mean=feature_extractor.image_mean, std=feature_extractor.image_std
+            ),
         ]
     )
     _val_transforms = Compose(
@@ -177,16 +185,22 @@ def main(**kwargs):
             Resize(feature_extractor.size),
             CenterCrop(feature_extractor.size),
             ToTensor(),
-            Normalize(mean=feature_extractor.image_mean, std=feature_extractor.image_std),
+            Normalize(
+                mean=feature_extractor.image_mean, std=feature_extractor.image_std
+            ),
         ]
     )
 
     def train_transforms(examples):
-        examples['pixel_values'] = [_train_transforms(image.convert("RGB")) for image in examples['image']]
+        examples["pixel_values"] = [
+            _train_transforms(image.convert("RGB")) for image in examples["image"]
+        ]
         return examples
 
     def val_transforms(examples):
-        examples['pixel_values'] = [_val_transforms(image.convert("RGB")) for image in examples['image']]
+        examples["pixel_values"] = [
+            _val_transforms(image.convert("RGB")) for image in examples["image"]
+        ]
         return examples
 
     # Set the transforms
@@ -195,9 +209,9 @@ def main(**kwargs):
     test_ds.set_transform(val_transforms)
 
     ###############################################################
-    ## DEFINE MODEL AND TRAINING CONFIGURATIONS
+    # DEFINE MODEL AND TRAINING CONFIGURATIONS
     ###############################################################
-    id2label = {id: label for id, label in enumerate(train_ds.features['label'].names)}
+    id2label = {id: label for id, label in enumerate(train_ds.features["label"].names)}
     label2id = {label: id for id, label in id2label.items()}
     num_labels = len(id2label.keys())
 

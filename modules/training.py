@@ -35,21 +35,46 @@ def train_finetuning(
         wandb.run.name = run_name
 
     unnormalize = UnNormalize(feature_extractor.image_mean, feature_extractor.image_std)
-    wandb.log({"train_examples": [wandb.Image(transforms.ToPILImage()(unnormalize(img))) for img in train_ds.shuffle(seed=seed)[:5]['pixel_values']]})
-    wandb.log({"val_examples": [wandb.Image(transforms.ToPILImage()(unnormalize(img))) for img in val_ds.shuffle(seed=seed)[:5]['pixel_values']]})
-    wandb.log({"test_examples": [wandb.Image(transforms.ToPILImage()(unnormalize(img))) for img in test_ds.shuffle(seed=seed)[:5]['pixel_values']]})
-    wandb.config.update({"datasets": {
-        "train_ds_samples": train_ds.num_rows,
-        "val_ds_samples": val_ds.num_rows,
-        "test_ds_samples": test_ds.num_rows,
-    }})
+    wandb.log(
+        {
+            "train_examples": [
+                wandb.Image(transforms.ToPILImage()(unnormalize(img)))
+                for img in train_ds.shuffle(seed=seed)[:5]["pixel_values"]
+            ]
+        }
+    )
+    wandb.log(
+        {
+            "val_examples": [
+                wandb.Image(transforms.ToPILImage()(unnormalize(img)))
+                for img in val_ds.shuffle(seed=seed)[:5]["pixel_values"]
+            ]
+        }
+    )
+    wandb.log(
+        {
+            "test_examples": [
+                wandb.Image(transforms.ToPILImage()(unnormalize(img)))
+                for img in test_ds.shuffle(seed=seed)[:5]["pixel_values"]
+            ]
+        }
+    )
+    wandb.config.update(
+        {
+            "datasets": {
+                "train_ds_samples": train_ds.num_rows,
+                "val_ds_samples": val_ds.num_rows,
+                "test_ds_samples": test_ds.num_rows,
+            }
+        }
+    )
     training_args = TrainingArguments(
         # run_name=run_name,
         output_dir=f"{output_dir}/{wandb.run.name}",
         seed=seed,
         save_strategy="epoch",
         evaluation_strategy="epoch",
-        logging_strategy='epoch',
+        logging_strategy="epoch",
         num_train_epochs=num_train_epochs,
         per_device_train_batch_size=per_device_train_batch_size,
         per_device_eval_batch_size=per_device_eval_batch_size,
@@ -129,11 +154,11 @@ def train_hyperparam_search(
 
         # set training arguments
         training_args = TrainingArguments(
-            output_dir=f'{output_dir}/{wandb.run.name}',
+            output_dir=f"{output_dir}/{wandb.run.name}",
             # seed=,
-            save_strategy='steps',
-            evaluation_strategy='steps',
-            logging_strategy='steps',
+            save_strategy="steps",
+            evaluation_strategy="steps",
+            logging_strategy="steps",
             eval_steps=25,
             logging_steps=25,
             save_steps=25,
@@ -149,7 +174,7 @@ def train_hyperparam_search(
             load_best_model_at_end=True,
             metric_for_best_model="accuracy",
             remove_unused_columns=False,
-            report_to='wandb',
+            report_to="wandb",
         )
         metrics = evaluate.combine([evaluate.load("accuracy")])
 

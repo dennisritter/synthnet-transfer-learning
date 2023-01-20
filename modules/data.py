@@ -13,11 +13,11 @@ class UnNormalize(object):
 
     def __call__(self, tensor):
         """
-            Args:
-                tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
-            Returns:
-                Tensor: Normalized image.
-            """
+        Args:
+            tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+        Returns:
+            Tensor: Normalized image.
+        """
         for t, m, s in zip(tensor, self.mean, self.std):
             t.mul_(s).add_(m)
             # The normalize code -> t.sub_(m).div_(s)
@@ -25,12 +25,12 @@ class UnNormalize(object):
 
 
 def train_val_test_imagefolder(train_dir: str, val_dir: str, test_dir: str):
-    """ Simple helper to load train, val, test dataset as Huggingface Dataset.
-    
+    """Simple helper to load train, val, test dataset as Huggingface Dataset.
+
         load datasets from image directory (huggingface)
         https://huggingface.co/docs/datasets/image_dataset
         - Ensure format ds_dir/label/filename_SPLIT.png
-        - Each filename has to include the split name 
+        - Each filename has to include the split name
           (e.g.: myname_test, train_my_name, my_val_name)
 
     Args:
@@ -47,9 +47,11 @@ def train_val_test_imagefolder(train_dir: str, val_dir: str, test_dir: str):
     if val_dir:
         val_ds = load_dataset("imagefolder", data_dir=val_dir, split="validation")
     else:
-        splits = test_ds.train_test_split(test_size=0.1, stratify_by_column="label")  # stratify
-        val_ds = splits['train']
-        test_ds = splits['test']
+        splits = test_ds.train_test_split(
+            test_size=0.1, stratify_by_column="label"
+        )  # stratify
+        val_ds = splits["train"]
+        test_ds = splits["test"]
 
     return train_ds, val_ds, test_ds
 
