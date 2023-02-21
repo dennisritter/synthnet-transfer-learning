@@ -3,7 +3,7 @@
 
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-import lightning as pl
+import pytorch_lightning as pl
 from torch.utils.data import DataLoader, random_split
 
 

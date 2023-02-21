@@ -9,8 +9,8 @@ from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, LightningDataModule, LightningModule, Trainer
 from rich import print
 
-from data.baseline_finetune_dm import BaselineFinetuneDM
-from data.generic_finetune_dm import GenericFinetuneDM
+from datamodules.baseline_finetune_dm import BaselineFinetuneDM
+from datamodules.generic_finetune_dm import GenericFinetuneDM
 from utils import logging_utils
 
 # pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
@@ -26,9 +26,10 @@ log = logging_utils.get_logger("rich")
 
 
 def train(cfg: DictConfig):
-    if cfg.get("seed"):
-        pl.seed_everything(cfg.seed, workers=True)
     log.info(OmegaConf.to_yaml(cfg), extra={"markup": True})
+    if cfg.get("seed"):
+        log.info(cfg.seed)
+        pl.seed_everything(cfg.seed, workers=True)
 
 
 @hydra.main(version_base=None, config_path=None, config_name=None)
