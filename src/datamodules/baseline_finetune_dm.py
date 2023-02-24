@@ -28,6 +28,11 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         num_workers: int = 4,
     ):
         super().__init__()
+
+        # this line allows to access init params with 'self.hparams' attribute
+        # also ensures init params will be stored in ckpt
+        self.save_hyperparameters(logger=False)
+
         self.train_dir = train_dir
         self.test_dir = test_dir
         self.batch_size = batch_size

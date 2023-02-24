@@ -23,6 +23,11 @@ class GenericFinetuneDM(pl.LightningDataModule):
         random_grayscale: bool = False,
     ):
         super().__init__()
+
+        # this line allows to access init params with 'self.hparams' attribute
+        # also ensures init params will be stored in ckpt
+        self.save_hyperparameters(logger=False)
+
         self.train_dir = train_dir
         self.val_dir = val_dir
         self.test_dir = test_dir
