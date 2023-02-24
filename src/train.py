@@ -8,6 +8,7 @@ import pyrootutils
 import pytorch_lightning as pl
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, LightningDataModule, LightningModule, Trainer
+from pytorch_lightning.loggers import Logger
 from rich import print
 
 import utils
@@ -34,15 +35,16 @@ def train(cfg: DictConfig):
 
     log.info(f"Instantiating datamodule <{cfg.data._target_}>")
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
+    datamodule.setup()
 
-    # log.info(f"Instantiating model <{cfg.model._target_}>")
-    # model: LightningModule = hydra.utils.instantiate(cfg.model)
+    log.info(f"Instantiating model <{cfg.model._target_}>")
+    model: LightningModule = hydra.utils.instantiate(cfg.model, num_classes=datamodule.num_classes)
 
-    # log.info("Instantiating callbacks...")
-    # callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))
+    log.info("Instantiating callbacks...")
+    callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))
 
-    # log.info("Instantiating loggers...")
-    # logger: List[Logger] = utils.instantiate_loggers(cfg.get("logger"))
+    log.info("Instantiating loggers...")
+    logger: List[Logger] = utils.instantiate_loggers(cfg.get("logger"))
 
     # log.info(f"Instantiating trainer <{cfg.trainer._target_}>")
     # trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)

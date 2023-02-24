@@ -1,0 +1,25 @@
+_target_: models.vit_module.VitModule
+
+model_name: "google/vit-base-patch16-224-in21k"
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 0.1
+  weight_decay: 0.1
+
+scheduler: None
+# scheduler:
+#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   _partial_: true
+#   mode: min
+#   factor: 0.1
+#   patience: 10
+
+# net:
+#   _target_: src.models.components.simple_dense_net.SimpleDenseNet
+#   input_size: 784
+#   lin1_size: 64
+#   lin2_size: 128
+#   lin3_size: 64
+#   output_size: 10
