@@ -1,6 +1,7 @@
 """The main run script."""
 
 from typing import List, Optional, Tuple
+import os
 
 import hydra
 import pyrootutils
@@ -24,14 +25,16 @@ log = logging_utils.get_logger("rich")
 #     test_dir="data/visda2017/test",
 # )
 
-
+@utils.task_wrapper
 def train(cfg: DictConfig):
     log.info(OmegaConf.to_yaml(cfg), extra={"markup": True})
+    log.info(os.listdir(cfg.get("paths").data_dir), extra={"markup": True})
     if cfg.get("seed"):
         log.info(cfg.seed)
         pl.seed_everything(cfg.seed, workers=True)
 
 
+# python src/train.py --config-dir configs --config-name train.yaml
 @hydra.main(version_base=None, config_path=None, config_name=None)
 def main(cfg: DictConfig) -> None:
     # train the model
