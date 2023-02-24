@@ -1,28 +1,25 @@
-""" DataModule interpreted from
-    A Broad Study of Pre-training for Domain Generalization and Adaptation
-    DOI:10.48550/arXiv.2203.11819
-    https://www.semanticscholar.org/paper/A-Broad-Study-of-Pre-training-for-Domain-and-Kim-Wang/e0bffb70cd8b5b5ecdc74e1f730dd7298ecc787b
-    https://github.com/VisionLearningGroup/Benchmark_Domain_Transfer
+"""DataModule interpreted from A Broad Study of Pre-training for Domain Generalization and Adaptation
+DOI:10.48550/arXiv.2203.11819 https://www.semanticscholar.org/paper/A-Broad-Study-of-Pre-training-for-Domain-and-Kim-
+Wang/e0bffb70cd8b5b5ecdc74e1f730dd7298ecc787b https://github.com/VisionLearningGroup/Benchmark_Domain_Transfer.
 
-    @InProceedings{kim2022unified,
-        title={A Broad Study of Pre-training for Domain Generalization and Adaptation},
-        author={Kim, Donghyun and Wang, Kaihong and Sclaroff, Stan and Saenko, Kate},
-        booktitle = {The European Conference on Computer Vision (ECCV)},
-        year = {2022}
-    }
+@InProceedings{kim2022unified,
+    title={A Broad Study of Pre-training for Domain Generalization and Adaptation},
+    author={Kim, Donghyun and Wang, Kaihong and Sclaroff, Stan and Saenko, Kate},
+    booktitle = {The European Conference on Computer Vision (ECCV)},
+    year = {2022}
+}
 
-    We took info about augmentations, dataset split, and other hardcoded parameters either from the paper
-    or (if not specified) from their code (e.g. batch_size, seed, transforms params)
+We took info about augmentations, dataset split, and other hardcoded parameters either from the paper
+or (if not specified) from their code (e.g. batch_size, seed, transforms params)
 """
 
-from torchvision import transforms
-from torchvision.datasets import ImageFolder
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader, random_split
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 class BaselineFinetuneDM(pl.LightningDataModule):
-
     def __init__(
         self,
         train_dir: str,

@@ -1,14 +1,12 @@
-""" A generic DataModule for fine-tuning.
-"""
+"""A generic DataModule for fine-tuning."""
 
-from torchvision import transforms
-from torchvision.datasets import ImageFolder
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader, random_split
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 class GenericFinetuneDM(pl.LightningDataModule):
-
     def __init__(
         self,
         train_dir: str = None,
@@ -43,7 +41,10 @@ class GenericFinetuneDM(pl.LightningDataModule):
                 transforms.RandomResizedCrop(self.image_size, scale=(0.7, 1.0)),
                 transforms.RandomApply([transforms.RandomHorizontalFlip()], p=int(self.random_horizontal_flip)),
                 transforms.RandomApply([transforms.RandomVerticalFlip()], p=int(self.random_vertical_flip)),
-                transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=int(self.random_color_jitter)),
+                transforms.RandomApply(
+                    [transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)],
+                    p=int(self.random_color_jitter),
+                ),
                 transforms.RandomApply([transforms.RandomGrayscale()], p=int(self.random_grayscale)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=self.image_mean, std=self.image_std),

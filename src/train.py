@@ -1,7 +1,7 @@
 """The main run script."""
 
-from typing import List, Optional, Tuple
 import os
+from typing import List, Optional, Tuple
 
 import hydra
 import pyrootutils
@@ -10,13 +10,14 @@ from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, LightningDataModule, LightningModule, Trainer
 from rich import print
 
+import utils
 from datamodules.baseline_finetune_dm import BaselineFinetuneDM
 from datamodules.generic_finetune_dm import GenericFinetuneDM
-from utils import logging_utils
 
 # pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-log = logging_utils.get_logger("rich")
+# log = utils.logging_utils.get_logger("rich")
+log = utils.get_pylogger(__name__)
 
 # pl.seed_everything(0)
 # dm = GenericFinetuneDM(
@@ -25,12 +26,10 @@ log = logging_utils.get_logger("rich")
 #     test_dir="data/visda2017/test",
 # )
 
+
 @utils.task_wrapper
 def train(cfg: DictConfig):
-    log.info(OmegaConf.to_yaml(cfg), extra={"markup": True})
-    log.info(os.listdir(cfg.get("paths").data_dir), extra={"markup": True})
     if cfg.get("seed"):
-        log.info(cfg.seed)
         pl.seed_everything(cfg.seed, workers=True)
 
 
