@@ -26,8 +26,8 @@ class VitModule(LightningModule):
         self,
         model_name: str,
         optimizer: torch.optim.Optimizer,
-        scheduler: torch.optim.lr_scheduler,
         num_classes: int,
+        scheduler: torch.optim.lr_scheduler = None,
     ):
         super().__init__()
 
@@ -46,9 +46,9 @@ class VitModule(LightningModule):
         self.criterion = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
-        self.train_acc = Accuracy(task="multiclass", num_classes=10)
-        self.val_acc = Accuracy(task="multiclass", num_classes=10)
-        self.test_acc = Accuracy(task="multiclass", num_classes=10)
+        self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
+        self.val_acc = Accuracy(task="multiclass", num_classes=num_classes)
+        self.test_acc = Accuracy(task="multiclass", num_classes=num_classes)
 
         # for averaging loss across batches
         self.train_loss = MeanMetric()
@@ -66,7 +66,7 @@ class VitModule(LightningModule):
         # so we need to make sure val_acc_best doesn't store accuracy from these checks
         self.val_acc_best.reset()
 
-    def model_step(self, batch: Any):
+    def model_step(self, batch: Any):  # TODO: LOGITS MUST BE TENSOR?!
         x, y = batch
         logits = self.forward(x)
         loss = self.criterion(logits, y)
@@ -154,4 +154,4 @@ class VitModule(LightningModule):
 
 
 if __name__ == "__main__":
-    _ = VitModule(None, None, None)
+    _ = VitModule(None, None, None, None)
