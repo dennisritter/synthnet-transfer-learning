@@ -12,9 +12,9 @@ Wang/e0bffb70cd8b5b5ecdc74e1f730dd7298ecc787b https://github.com/VisionLearningG
 We took info about augmentations, dataset split, and other hardcoded parameters either from the paper
 or (if not specified) from their code (e.g. batch_size, seed, transforms params)
 """
-
+import numpy as np
 import pytorch_lightning as pl
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
@@ -26,6 +26,7 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         test_dir: str,
         batch_size: int = 64,
         num_workers: int = 4,
+        toy: bool = False,
     ):
         super().__init__()
 
@@ -37,6 +38,7 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         self.test_dir = test_dir
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.toy = toy
 
         self.train_transform = transforms.Compose(
             [
@@ -68,10 +70,16 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         self.train.transform = self.train_transform
         self.val.transform = self.val_transform
         self.test.transform = self.val_transform
-
-        self.num_classes = len(self.train.classes)
-        self.label2idx = self.train.class_to_idx
+        self.num_classes = len(self.train.dataset.classes)
+        self.label2idx = self.train.dataset.class_to_idx
         self.idx2label = {idx: label for label, idx in self.label2idx.items()}
+
+        # If toy is set true, use a very small subset of the data just for testing
+        # Use 80 samples for training and 20 for testing
+        if self.toy:
+            self.train = Subset(self.train, np.arange(80))
+            self.val = Subset(self.val, np.arange(20))
+            self.test = Subset(self.test, np.arange(20))
 
     def train_dataloader(self):
         return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers)
