@@ -66,7 +66,7 @@ class VitModule(LightningModule):
         # so we need to make sure val_acc_best doesn't store accuracy from these checks
         self.val_acc_best.reset()
 
-    def model_step(self, batch: Any):  # TODO: LOGITS MUST BE TENSOR?!
+    def model_step(self, batch: Any):
         x, y = batch
         logits = self.forward(x)["logits"]
         loss = self.criterion(logits, y)
