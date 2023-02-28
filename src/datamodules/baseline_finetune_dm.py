@@ -70,22 +70,22 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         self.train.transform = self.train_transform
         self.val.transform = self.val_transform
         self.test.transform = self.val_transform
-        self.num_classes = len(self.train.dataset.classes)
-        self.label2idx = self.train.dataset.class_to_idx
+        self.num_classes = len(self.train.classes)
+        self.label2idx = self.train.class_to_idx
         self.idx2label = {idx: label for label, idx in self.label2idx.items()}
 
         # If toy is set true, use a very small subset of the data just for testing
         # Use 80 samples for training and 20 for testing
         if self.toy:
-            self.train = Subset(self.train, np.arange(80))
-            self.val = Subset(self.val, np.arange(20))
-            self.test = Subset(self.test, np.arange(20))
+            self.train = Subset(self.train, np.random.choice(np.arange(len(self.train)), size=80, replace=False))
+            self.val = Subset(self.val, np.random.choice(np.arange(len(self.val)), size=80, replace=False))
+            self.test = Subset(self.test, np.random.choice(np.arange(len(self.test)), size=80, replace=False))
 
     def train_dataloader(self):
-        return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
     def val_dataloader(self):
-        return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
     def test_dataloader(self):
-        return DataLoader(dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
