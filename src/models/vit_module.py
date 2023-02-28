@@ -8,7 +8,7 @@ from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
 
 class VitModule(LightningModule):
-    """Example of LightningModule for MNIST classification.
+    """Example of LightningModule for Vit classification.
 
     A LightningModule organizes your PyTorch code into 6 sections:
         - Computations (init)
@@ -68,7 +68,7 @@ class VitModule(LightningModule):
 
     def model_step(self, batch: Any):  # TODO: LOGITS MUST BE TENSOR?!
         x, y = batch
-        logits = self.forward(x)
+        logits = self.forward(x)["logits"]
         loss = self.criterion(logits, y)
         preds = torch.argmax(logits, dim=1)
         return loss, preds, y
