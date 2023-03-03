@@ -1,7 +1,8 @@
 """A generic DataModule for fine-tuning."""
 
+import numpy as np
 import pytorch_lightning as pl
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
@@ -14,6 +15,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         test_dir: str = None,
         batch_size: int = 64,
         num_workers: int = 4,
+        toy: bool = False,
         image_size: tuple = (224, 224),
         image_mean: list = [0.485, 0.456, 0.406],
         image_std: list = [0.229, 0.224, 0.225],
@@ -83,6 +85,13 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.num_classes = len(self.train.classes)
         self.label2idx = self.train.class_to_idx
         self.idx2label = {idx: label for label, idx in self.label2idx.items()}
+
+        # If toy is set true, use a very small subset of the data just for testing
+        # Use 80 samples for training and 20 for testing
+        if self.toy:
+            self.train = Subset(self.train, np.random.choice(np.arange(len(self.train)), size=80, replace=False))
+            self.val = Subset(self.val, np.random.choice(np.arange(len(self.val)), size=80, replace=False))
+            self.test = Subset(self.test, np.random.choice(np.arange(len(self.test)), size=80, replace=False))
 
     def train_dataloader(self):
         return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
