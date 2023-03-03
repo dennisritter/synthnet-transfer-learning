@@ -3,6 +3,8 @@ defaults:
   # - early_stopping.yaml
   - model_summary.yaml
   - rich_progress_bar.yaml
+  - log_prediction_samples.yaml
+  - log_training_samples.yaml
   - _self_
 
 model_checkpoint:
@@ -20,3 +22,9 @@ model_checkpoint:
 
 model_summary:
   max_depth: -1
+
+log_prediction_samples:
+  n: 4
+
+log_training_samples:
+  n: 4

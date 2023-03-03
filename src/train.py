@@ -1,15 +1,12 @@
 """The main run script."""
 
-import os
 from typing import List, Optional, Tuple
 
 import hydra
-import pyrootutils
 import pytorch_lightning as pl
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.loggers import Logger
-from rich import print
 
 import utils
 from datamodules.baseline_finetune_dm import BaselineFinetuneDM
@@ -28,6 +25,7 @@ def train(cfg: DictConfig):
     log.info(f"Instantiating datamodule <{cfg.data._target_}>")
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
     datamodule.setup()
+    # datamodule.get_imgs()
 
     log.info(f"Instantiating model <{cfg.model._target_}>")
     model: LightningModule = hydra.utils.instantiate(cfg.model, num_classes=datamodule.num_classes)
