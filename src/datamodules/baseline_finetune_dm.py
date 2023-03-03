@@ -40,6 +40,9 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         self.num_workers = num_workers
         self.toy = toy
 
+        self.mean = [0.485, 0.456, 0.406]
+        self.std = [0.229, 0.224, 0.225]
+
         self.train_transform = transforms.Compose(
             [
                 transforms.RandomResizedCrop(224, scale=(0.7, 1.0)),
@@ -47,14 +50,14 @@ class BaselineFinetuneDM(pl.LightningDataModule):
                 transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3),
                 transforms.RandomGrayscale(),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                transforms.Normalize(mean=self.mean, std=self.std),
             ]
         )
         self.val_transform = transforms.Compose(
             [
                 transforms.Resize((224, 224)),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                transforms.Normalize(mean=self.mean, std=self.std),
             ]
         )
 
@@ -85,7 +88,7 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
     def val_dataloader(self):
-        return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
+        return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
+        return DataLoader(dataset=self.test, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)
