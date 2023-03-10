@@ -5,15 +5,20 @@ model_name: "google/vit-base-patch16-224-in21k"
 optimizer:
   _target_: torch.optim.AdamW
   _partial_: true
-  lr: 0.1
+  lr: 0.001
   weight_decay: 0.1
 # scheduler:
-#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   _target_: torch.optim.lr_scheduler.LinearLR
 #   _partial_: true
-#   mode: min
-#   factor: 0.1
-#   patience: 10
-
+#   start_factor: 0.1
+#   end_factor: 1.0
+#   total_iters: 2
+#   verbose: true
+scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  _partial_: true
+  T_max: ${trainer.max_epochs}
+  verbose: false
 # net:
 #   _target_: src.models.components.simple_dense_net.SimpleDenseNet
 #   input_size: 784
