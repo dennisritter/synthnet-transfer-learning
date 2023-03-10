@@ -35,6 +35,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.test_dir = test_dir
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.toy = toy
         self.image_size = image_size
         self.image_mean = image_mean
         self.image_std = image_std

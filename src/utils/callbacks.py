@@ -3,7 +3,6 @@
 import numpy as np
 from pytorch_lightning.callbacks import Callback
 from torch.utils.data import DataLoader
-from torchvision.transforms import ToPILImage
 
 import utils
 from utils.transforms import UnNormalize
@@ -24,8 +23,6 @@ class LogPredictionSamplesCallback(Callback):
 
         # Let's log 20 sample image predictions from the first batch
         if batch_idx == 0:
-            if self.n > len(batch):
-                self.n = len(batch)
             x, y = batch
             images = [img for img in x[: self.n]]
             idx2label = trainer.datamodule.idx2label
@@ -33,7 +30,9 @@ class LogPredictionSamplesCallback(Callback):
                 f"gt: {idx2label[y_i.item()]} | pred: {idx2label[pred_i.item()]}"
                 for y_i, pred_i in zip(y[: self.n], outputs["preds"][: self.n])
             ]
-            trainer.logger.log_image(key="prediction_samples", images=images, caption=captions)
+            trainer.logger.log_image(
+                key="prediction_samples", images=images, step=trainer.current_epoch, caption=captions
+            )
 
 
 class LogTrainingSamplesCallback(Callback):
