@@ -1,6 +1,7 @@
 """Callbacks for pytorch lightning trainer."""
 
 import numpy as np
+import wandb
 from pytorch_lightning.callbacks import Callback
 from pytorch_lightning.callbacks.finetuning import BaseFinetuning
 from torch.utils.data import DataLoader
@@ -9,14 +10,6 @@ import utils
 from utils.transforms import UnNormalize
 
 log = utils.get_pylogger(__name__)
-
-
-class ResetOptimizer(Callback):
-    def __init__(self):
-        super().__init__()
-
-    def on_load_checkpoint(self, trainer, pl_module, checkpoint) -> None:
-        pass
 
 
 class FreezeAllButLast(BaseFinetuning):
@@ -59,8 +52,8 @@ class LogPredictionSamplesCallback(Callback):
                 f"gt: {idx2label[y_i.item()]} | pred: {idx2label[pred_i.item()]}"
                 for y_i, pred_i in zip(y[: self.n], outputs["preds"][: self.n])
             ]
-            trainer.logger.log_image(
-                key="prediction_samples", images=images, step=trainer.current_epoch, caption=captions
+            trainer.logger.experiment.log(
+                {"prediction_samples": [wandb.Image(img, cap) for img, cap in zip(images, captions)]}, commit=False
             )
         super().on_validation_batch_end(trainer, pl_module, outputs, batch, batch_idx, dataloader_idx)
 
@@ -78,8 +71,10 @@ class LogTrainingSamplesCallback(Callback):
         samples = next(iter(loader))
         labels = [dm.idx2label[label_i.item()] for label_i in samples[1]]
 
-        # trainer.logger.log_image(key="original_training_samples", images=original_images, caption=labels)
-        trainer.logger.log_image(key="transformed_training_samples", images=list(samples[0]), caption=labels)
+        trainer.logger.experiment.log(
+            {"transformed_training_samples": [wandb.Image(img, cap) for img, cap in zip(list(samples[0]), labels)]},
+            commit=False,
+        )
         return super().on_train_start(trainer, pl_module)
 
 

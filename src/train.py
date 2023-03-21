@@ -51,6 +51,8 @@ def train(cfg: DictConfig):
         utils.log_hyperparameters(object_dict)
 
     if cfg.get("train"):
+        log.info("Validating loaded model before training!")
+        trainer.validate(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
         log.info("Starting training!")
         trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
 
