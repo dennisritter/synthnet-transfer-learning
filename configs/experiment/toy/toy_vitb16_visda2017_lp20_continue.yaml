@@ -48,8 +48,8 @@ model_checkpoint:
   save_weights_only: False
 
 # simply provide checkpoint path to resume training
-ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_10-15-15/checkpoints/last.ckpt
-
+ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_18-32-12/checkpoints/last.ckpt
 logger:
   wandb:
+    id: p5j9rub6
     tags: ${tags}
