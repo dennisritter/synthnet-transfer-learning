@@ -35,7 +35,7 @@ class FreezeAllButLast(BaseFinetuning):
         for name, param in pl_module.net.named_parameters():
             log.debug(f"{name}: requires_grad={param.requires_grad}")
 
-    def finetune_function(self, pl_module, epoch, optimizer, opt_idx) -> None:
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
         pass
 
 
@@ -44,7 +44,7 @@ class LogPredictionSamplesCallback(Callback):
         super().__init__()
         self.n = n
 
-    def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
+    def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx=0):
         """Called when the validation batch ends."""
 
         # `outputs` comes from `LightningModule.validation_step`
@@ -62,6 +62,7 @@ class LogPredictionSamplesCallback(Callback):
             trainer.logger.log_image(
                 key="prediction_samples", images=images, step=trainer.current_epoch, caption=captions
             )
+        super().on_validation_batch_end(trainer, pl_module, outputs, batch, batch_idx, dataloader_idx)
 
 
 class LogTrainingSamplesCallback(Callback):

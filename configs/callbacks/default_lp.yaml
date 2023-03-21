@@ -6,6 +6,7 @@ defaults:
   - log_training_samples.yaml
   - learning_rate_monitor.yaml
   - freeze_all_but_last.yaml
+  - log_layers_requires_grad.yaml
   - _self_
 
 model_checkpoint:
