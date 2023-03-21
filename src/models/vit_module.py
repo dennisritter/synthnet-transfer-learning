@@ -40,7 +40,7 @@ class VitModule(LightningModule):
             num_labels=num_classes,
             ignore_mismatched_sizes=True,
         )
-        # self.net = net
+        self.class_head = self.net.classifier
 
         # loss function
         self.criterion = torch.nn.CrossEntropyLoss()

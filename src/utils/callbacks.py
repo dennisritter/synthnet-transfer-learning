@@ -2,12 +2,41 @@
 
 import numpy as np
 from pytorch_lightning.callbacks import Callback
+from pytorch_lightning.callbacks.finetuning import BaseFinetuning
 from torch.utils.data import DataLoader
 
 import utils
 from utils.transforms import UnNormalize
 
 log = utils.get_pylogger(__name__)
+
+
+class ResetOptimizer(Callback):
+    def __init__(self):
+        super().__init__()
+
+    def on_load_checkpoint(self, trainer, pl_module, checkpoint) -> None:
+        pass
+
+
+class FreezeAllButLast(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        # freeze any module you want
+        for name, param in pl_module.net.named_parameters():
+            param.requires_grad = False
+
+        # TODO: Make generic or add model name to know how to select last layers
+        pl_module.net.classifier.weight.requires_grad = True
+        pl_module.net.classifier.bias.requires_grad = True
+
+        for name, param in pl_module.net.named_parameters():
+            log.debug(f"{name}: requires_grad={param.requires_grad}")
+
+    def finetune_function(self, pl_module, epoch, optimizer, opt_idx) -> None:
+        pass
 
 
 class LogPredictionSamplesCallback(Callback):
@@ -50,4 +79,14 @@ class LogTrainingSamplesCallback(Callback):
 
         # trainer.logger.log_image(key="original_training_samples", images=original_images, caption=labels)
         trainer.logger.log_image(key="transformed_training_samples", images=list(samples[0]), caption=labels)
+        return super().on_train_start(trainer, pl_module)
+
+
+class LogLayersRequiresGrad(Callback):
+    def __init__(self):
+        super().__init__()
+
+    def on_train_start(self, trainer, pl_module) -> None:
+        for name, param in pl_module.net.named_parameters():
+            log.info(f"{name}: requires_grad={param.requires_grad}")
         return super().on_train_start(trainer, pl_module)
