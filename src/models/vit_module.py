@@ -152,6 +152,10 @@ class VitModule(LightningModule):
             }
         return {"optimizer": optimizer}
 
+    def on_load_checkpoint(self, checkpoint) -> None:
+        print("Checkpoint Loaded")
+        return super().on_load_checkpoint(checkpoint)
+
 
 if __name__ == "__main__":
     _ = VitModule(None, None, None, None)
