@@ -5,7 +5,7 @@ defaults:
   - log_prediction_samples.yaml
   - log_training_samples.yaml
   - learning_rate_monitor.yaml
-  - log_layers_requires_grad.yaml
+  - freeze_all_but_last.yaml
   - _self_
 
 model_checkpoint:
@@ -15,11 +15,6 @@ model_checkpoint:
   mode: "max"
   save_last: True
   auto_insert_metric_name: False
-
-# early_stopping:
-#   monitor: "val/acc"
-#   patience: 100
-#   mode: "max"
 
 model_summary:
   max_depth: -1

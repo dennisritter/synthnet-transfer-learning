@@ -7,6 +7,12 @@ optimizer:
   _partial_: true
   lr: 0.001
   weight_decay: 0.1
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  _partial_: true
+  T_max: ${trainer.max_epochs}
+  verbose: false
 # scheduler:
 #   _target_: torch.optim.lr_scheduler.LinearLR
 #   _partial_: true
@@ -14,15 +20,3 @@ optimizer:
 #   end_factor: 1.0
 #   total_iters: 2
 #   verbose: true
-scheduler:
-  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  _partial_: true
-  T_max: ${trainer.max_epochs}
-  verbose: false
-# net:
-#   _target_: src.models.components.simple_dense_net.SimpleDenseNet
-#   input_size: 784
-#   lin1_size: 64
-#   lin2_size: 128
-#   lin3_size: 64
-#   output_size: 10

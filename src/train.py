@@ -25,7 +25,6 @@ def train(cfg: DictConfig):
     log.info(f"Instantiating datamodule <{cfg.data._target_}>")
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
     datamodule.setup()
-    # datamodule.get_imgs()
 
     log.info(f"Instantiating model <{cfg.model._target_}>")
     model: LightningModule = hydra.utils.instantiate(cfg.model, num_classes=datamodule.num_classes)
@@ -47,7 +46,6 @@ def train(cfg: DictConfig):
         "logger": logger,
         "trainer": trainer,
     }
-
     if logger:
         log.info("Logging hyperparameters!")
         utils.log_hyperparameters(object_dict)
