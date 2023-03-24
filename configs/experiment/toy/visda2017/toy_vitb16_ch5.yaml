@@ -19,7 +19,6 @@ seed: 42
 trainer:
   min_epochs: 5
   max_epochs: 5
-
 model:
   model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
@@ -27,10 +26,6 @@ model:
     lr: 0.1
     momentum: 0.9
   scheduler: null
-  #   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  #   _partial_: true
-  #   T_max: ${trainer.max_epochs}
-  #   verbose: false
 
 data:
   toy: true
