@@ -12,25 +12,24 @@ defaults:
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["toy", "visda2017", "vitb16", "SGD", "classhead_only"]
+tags: ["toy", "visda2017", "vitb16", "SGD", "class head"]
 
 seed: 42
 
 trainer:
-  min_epochs: 20
-  max_epochs: 20
+  min_epochs: 5
+  max_epochs: 5 # Continue training for N epochs. (does NOT include pretrained epochs)
 
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
+  # Load model from checkpoint (weights only)
+  _target_: models.vit_module.VitModule.load_from_checkpoint
+  checkpoint_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_18-32-12/checkpoints/last.ckpt
+  verbose: true
   optimizer:
     _target_: torch.optim.SGD
     lr: 0.1
     momentum: 0.9
   scheduler: null
-  #   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  #   _partial_: true
-  #   T_max: ${trainer.max_epochs}
-  #   verbose: false
 
 data:
   toy: true
@@ -49,4 +48,7 @@ model_checkpoint:
 
 logger:
   wandb:
+    project: lightning_toy_runs
+    job_type: "class head continue"
+    name: ${hydra.runtime.choices[experiment]}
     tags: ${tags}

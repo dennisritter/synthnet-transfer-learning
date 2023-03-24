@@ -12,28 +12,21 @@ defaults:
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["toy", "visda2017", "vitb16", "SGD", "classhead_only"]
+tags: ["toy", "visda2017", "vitb16", "SGD", "class head"]
 
 seed: 42
 
 trainer:
-  min_epochs: 5
-  max_epochs: 5
+  min_epochs: 10
+  max_epochs: 10 # epochs_of_run_to_continue + epochs_to_add
 
 model:
-  _target_: models.vit_module.VitModule.load_from_checkpoint #! Load model from checkpoint (weights only)
-  checkpoint_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_18-32-12/checkpoints/last.ckpt #! Checkpoint must be a class_head only run
-  verbose: true
-  # model_name: "google/vit-base-patch16-224-in21k"
+  model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.SGD
     lr: 0.1
     momentum: 0.9
   scheduler: null
-  #   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  #   _partial_: true
-  #   T_max: ${trainer.max_epochs}
-  #   verbose: false
 
 data:
   toy: true
@@ -51,8 +44,11 @@ model_checkpoint:
   save_weights_only: False
 
 # simply provide checkpoint path to resume training
-# ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_18-32-12/checkpoints/last.ckpt
+ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-22_00-11-28/checkpoints/last.ckpt
 logger:
   wandb:
-    # id: q4n2yfj9
+    id: zpxcsmbz
+    # project: lightning_toy_runs
+    # job_type: "fine tuning"
+    # name: ${hydra.runtime.choices[experiment]}
     tags: ${tags}

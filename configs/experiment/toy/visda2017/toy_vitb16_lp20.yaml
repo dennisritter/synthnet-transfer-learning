@@ -12,13 +12,13 @@ defaults:
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["toy", "visda2017", "vitb16", "SGD", "classhead_only"]
+tags: ["toy", "visda2017", "vitb16", "SGD", "class head"]
 
 seed: 42
 
 trainer:
-  min_epochs: 25
-  max_epochs: 25
+  min_epochs: 20
+  max_epochs: 20
 
 model:
   model_name: "google/vit-base-patch16-224-in21k"
@@ -47,9 +47,9 @@ data:
 model_checkpoint:
   save_weights_only: False
 
-# simply provide checkpoint path to resume training
-ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-22_00-11-28/checkpoints/last.ckpt
 logger:
   wandb:
-    id: zpxcsmbz
+    project: lightning_toy_runs
+    job_type: "class head"
+    name: ${hydra.runtime.choices[experiment]}
     tags: ${tags}

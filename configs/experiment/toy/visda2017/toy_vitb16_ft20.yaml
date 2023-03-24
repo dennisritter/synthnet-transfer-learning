@@ -12,16 +12,14 @@ defaults:
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["toy", "visda2017", "vitb16", "CosineAnnealingLR", "fine tuning (LP-FT)"]
+tags: ["toy", "visda2017", "vitb16", "CosineAnnealingLR", "fine tuning"]
 
 seed: 42
 
 trainer:
-  min_epochs: 20
-  max_epochs: 20
+  min_epochs: 5
+  max_epochs: 5
 model:
-  _target_: models.vit_module.VitModule.load_from_checkpoint #! Load model from checkpoint (weights only)
-  checkpoint_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_10-15-15/checkpoints/last.ckpt #! Checkpoint must be a class_head only run
   model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.AdamW
@@ -48,4 +46,7 @@ data:
 
 logger:
   wandb:
+    project: lightning_toy_runs
+    job_type: "fine tuning"
+    name: ${hydra.runtime.choices[experiment]}
     tags: ${tags}
