@@ -6,7 +6,7 @@
 defaults:
   - override /data: generic_visda2017_toy.yaml
   - override /model: vit.yaml
-  - override /callbacks: default_lp.yaml
+  - override /callbacks: default_ch.yaml
   - override /trainer: default.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
@@ -17,14 +17,11 @@ tags: ["toy", "visda2017", "vitb16", "SGD", "class head"]
 seed: 42
 
 trainer:
-  min_epochs: 5
-  max_epochs: 5 # Continue training for N epochs. (does NOT include pretrained epochs)
+  min_epochs: 10
+  max_epochs: 10 # epochs_of_run_to_continue + epochs_to_add
 
 model:
-  # Load model from checkpoint (weights only)
-  _target_: models.vit_module.VitModule.load_from_checkpoint
-  checkpoint_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_18-32-12/checkpoints/last.ckpt
-  verbose: true
+  model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.SGD
     lr: 0.1
@@ -46,9 +43,12 @@ data:
 model_checkpoint:
   save_weights_only: False
 
+# simply provide checkpoint path to resume training
+ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-22_00-11-28/checkpoints/last.ckpt
 logger:
   wandb:
-    project: lightning_toy_runs
-    job_type: "class head continue"
-    name: ${hydra.runtime.choices[experiment]}
+    id: zpxcsmbz
+    # project: lightning_toy_runs
+    # job_type: "fine tuning"
+    # name: ${hydra.runtime.choices[experiment]}
     tags: ${tags}

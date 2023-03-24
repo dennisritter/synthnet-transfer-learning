@@ -6,31 +6,34 @@
 defaults:
   - override /data: generic_visda2017_toy.yaml
   - override /model: vit.yaml
-  - override /callbacks: default_lp.yaml
+  - override /callbacks: default_ft.yaml
   - override /trainer: default.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["toy", "visda2017", "vitb16", "SGD", "class head"]
+tags: ["toy", "visda2017", "vitb16", "CosineAnnealingLR", "fine tuning (CH-FT)"]
 
 seed: 42
 
 trainer:
-  min_epochs: 20
-  max_epochs: 20
-
+  min_epochs: 5
+  max_epochs: 5
 model:
+  # Load model from checkpoint (weights only)
+  _target_: models.vit_module.VitModule.load_from_checkpoint
+  checkpoint_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_10-15-15/checkpoints/last.ckpt
   model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
-    _target_: torch.optim.SGD
-    lr: 0.1
-    momentum: 0.9
-  scheduler: null
-  #   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  #   _partial_: true
-  #   T_max: ${trainer.max_epochs}
-  #   verbose: false
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 0.001
+    weight_decay: 0.1
+  scheduler:
+    _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+    _partial_: true
+    T_max: ${trainer.max_epochs}
+    verbose: false
 
 data:
   toy: true
@@ -44,12 +47,9 @@ data:
   random_color_jitter: true
   random_grayscale: true
 
-model_checkpoint:
-  save_weights_only: False
-
 logger:
   wandb:
     project: lightning_toy_runs
-    job_type: "class head"
+    job_type: "fine tuning (CH-FT)"
     name: ${hydra.runtime.choices[experiment]}
     tags: ${tags}
