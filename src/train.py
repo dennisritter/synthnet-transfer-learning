@@ -28,6 +28,7 @@ def train(cfg: DictConfig):
 
     log.info(f"Instantiating model <{cfg.model._target_}>")
     model: LightningModule = hydra.utils.instantiate(cfg.model, num_classes=datamodule.num_classes)
+    # TODO: Add model = torch.compile(model) when supported for python 3.11+
 
     log.info("Instantiating callbacks...")
     callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))

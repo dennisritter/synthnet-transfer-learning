@@ -51,5 +51,5 @@ logger:
   wandb:
     project: lightning_toy_runs
     job_type: "class head"
-    name: ${hydra.runtime.choices[experiment]}
+    name: ${hydra:runtime.choices.experiment}
     tags: ${tags}

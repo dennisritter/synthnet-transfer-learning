@@ -48,5 +48,5 @@ logger:
   wandb:
     project: lightning_toy_runs
     job_type: "fine tuning"
-    name: ${hydra.runtime.choices[experiment]}
+    name: ${hydra:runtime.choices[experiment]}
     tags: ${tags}
