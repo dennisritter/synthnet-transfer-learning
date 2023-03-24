@@ -6,7 +6,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: test
-      image: beuthdritter/synthnet-finetuning
+      image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
           valueFrom:
@@ -35,19 +35,20 @@ spec:
           mountPath: /src-pv
       command: ["/bin/bash", "-c"]
       args:
-        - cd /src-pv/feature-extractor-finetuning;
+        # - while true; do sleep 30; done;
+        - cd /src-pv/synthnet-transfer-learning
           git checkout develop;
           git pull;
           cd /workspace;
-          cp -r /src-pv/feature-extractor-finetuning/* /workspace;
-          bash scripts/_test.sh;
+          cp -r /src-pv/synthnet-transfer-learning/* /workspace;
+          python src/train.py --config-dir configs --config-name train.yaml experiment=toy/visda2017/toy_vitb16_ch5;
       resources:
         limits:
           nvidia.com/gpu: 1
           memory: "32Gi"
           cpu: "32"
   nodeSelector:
-    gpu: a100
+    gpu: v100
   volumes:
     - name: synthnet-finetuning-volume
       persistentVolumeClaim:

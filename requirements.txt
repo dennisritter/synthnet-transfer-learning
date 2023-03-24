@@ -10,10 +10,10 @@ wandb
 omegaconf
 hydra-core
 hydra-colorlog
+rich            # beautiful text formatting in terminal
 # --- other ---
 pyrootutils     # standardizing the project root setup
 pre-commit      # hooks for applying linters on commit
-rich            # beautiful text formatting in terminal
 black           # Python code formatter
 flake8          # python linter
 isort           # sort python imports
