@@ -77,7 +77,7 @@ def train(cfg: DictConfig):
 
 
 # python src/train.py --config-dir configs --config-name train.yaml
-@hydra.main(version_base=None, config_path=None, config_name=None)
+@hydra.main(version_base=None, config_path="../configs", config_name="train.yaml")
 def main(cfg: DictConfig) -> None:
     train(cfg)
 

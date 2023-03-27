@@ -60,14 +60,14 @@ repos:
 
   # python security linter
   - repo: https://github.com/PyCQA/bandit
-    rev: "1.7.4"
+    rev: "1.7.5"
     hooks:
       - id: bandit
         args: ["-s", "B101"]
 
   # yaml formatting
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.4
+    rev: v3.0.0-alpha.6
     hooks:
       - id: prettier
         types: [yaml]
@@ -93,12 +93,11 @@ repos:
 
   # word spelling linter
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
         args:
-          - --skip=logs/**,data/**,*.ipynb
-          # - --ignore-words-list=abc,def
+          - --skip=logs/**,data/**,*.ipynb,README.md
 
   # jupyter notebook cell output clearing
   - repo: https://github.com/kynan/nbstripout
@@ -108,7 +107,7 @@ repos:
 
   # jupyter notebook linting
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.6.3
+    rev: 1.6.4
     hooks:
       - id: nbqa-black
         args: ["--line-length=120"]
