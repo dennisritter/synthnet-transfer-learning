@@ -37,7 +37,7 @@ spec:
       args:
         # - while true; do sleep 30; done;
         - cd /src-pv/synthnet-transfer-learning
-          git checkout develop;
+          git checkout main;
           git pull;
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
