@@ -4,7 +4,7 @@
 # python train.py experiment=example
 
 defaults:
-  - override /data: generic_visda2017_toy.yaml
+  - override /data: generic_visda2017.yaml
   - override /model: vit.yaml
   - override /callbacks: default_ft.yaml
   - override /trainer: default.yaml
@@ -15,7 +15,7 @@ defaults:
 tags:
   [
     "visda2017",
-    "vitb16",
+    "vitl16",
     "fine tuning",
     "CosineAnnealingLR",
     "baseline augmentations",
@@ -24,36 +24,33 @@ tags:
 seed: 42
 
 trainer:
-  min_epochs: 5
-  max_epochs: 5
+  min_epochs: 20
+  max_epochs: 20
+
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
+  model_name: "google/vit-large-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
-    lr: 0.001
-    weight_decay: 0.1
+    lr: 0.1
+    weight_decay: 0.01
   scheduler:
     _target_: torch.optim.lr_scheduler.CosineAnnealingLR
     _partial_: true
     T_max: ${trainer.max_epochs}
     verbose: false
 
-data:
-  toy: true
-  train_dir: ${paths.data_dir}visda2017/train
-  # val_dir: ${paths.data_dir}visda2017/val
-  test_dir: ${paths.data_dir}visda2017/test
-  batch_size: 4
-  num_workers: 4
-  random_horizontal_flip: true
-  random_vertical_flip: false
-  random_color_jitter: true
-  random_grayscale: true
-
 logger:
   wandb:
-    project: lightning_toy_runs
+    project: STL-visda2017
     job_type: "fine tuning"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
+# data:
+#   toy: false
+#   batch_size: 32
+#   num_workers: 8
+#   random_horizontal_flip: true
+#   random_vertical_flip: false
+#   random_color_jitter: true
+#   random_grayscale: true

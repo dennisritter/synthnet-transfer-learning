@@ -1,0 +1,56 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /data: generic_visda2017.yaml
+  - override /model: vit.yaml
+  - override /callbacks: default_ft.yaml
+  - override /trainer: default.yaml
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags:
+  [
+    "visda2017",
+    "vitl16",
+    "fine tuning",
+    "CosineAnnealingLR",
+    "baseline augmentations",
+  ]
+
+seed: 42
+
+trainer:
+  min_epochs: 20
+  max_epochs: 20
+
+model:
+  model_name: "google/vit-large-patch16-224-in21k"
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 0.001
+    weight_decay: 0.01
+  scheduler:
+    _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+    _partial_: true
+    T_max: ${trainer.max_epochs}
+    verbose: false
+
+logger:
+  wandb:
+    project: STL-visda2017
+    job_type: "fine tuning"
+    name: ${hydra:runtime.choices.experiment}
+    tags: ${tags}
+# data:
+#   toy: false
+#   batch_size: 32
+#   num_workers: 8
+#   random_horizontal_flip: true
+#   random_vertical_flip: false
+#   random_color_jitter: true
+#   random_grayscale: true

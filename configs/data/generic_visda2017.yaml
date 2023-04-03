@@ -1,0 +1,11 @@
+_target_: datamodules.generic_finetune_dm.GenericFinetuneDM
+train_dir: ${paths.data_dir}visda2017/train
+# val_dir: ${paths.data_dir}visda2017/val
+test_dir: ${paths.data_dir}visda2017/test
+batch_size: 32
+num_workers: 8
+toy: false
+random_horizontal_flip: true
+random_vertical_flip: false
+random_color_jitter: true
+random_grayscale: true
