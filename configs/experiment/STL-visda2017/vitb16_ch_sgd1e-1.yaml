@@ -13,13 +13,14 @@ defaults:
 # this allows you to overwrite only specified parameters
 
 tags:
-  ["visda2017", "vitl16", "class head only", "SGD", "baseline augmentations"]
+  ["visda2017", "vitb16", "class head only", "SGD", "baseline augmentations"]
 
 seed: 42
 
 trainer:
-  min_epochs: 20
+  min_epochs: 1
   max_epochs: 20
+
 model:
   model_name: "google/vit-large-patch16-224-in21k"
   optimizer:

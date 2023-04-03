@@ -15,7 +15,7 @@ defaults:
 tags:
   [
     "visda2017",
-    "vitl16",
+    "vitb16",
     "fine tuning",
     "CosineAnnealingLR",
     "baseline augmentations",
@@ -24,7 +24,7 @@ tags:
 seed: 42
 
 trainer:
-  min_epochs: 20
+  min_epochs: 1
   max_epochs: 20
 
 model:

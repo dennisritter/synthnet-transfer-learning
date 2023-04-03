@@ -53,7 +53,8 @@ class LogPredictionSamplesCallback(Callback):
                 for y_i, pred_i in zip(y[: self.n], outputs["preds"][: self.n])
             ]
             trainer.logger.experiment.log(
-                {"prediction_samples": [wandb.Image(img, cap) for img, cap in zip(images, captions)]}, commit=False
+                {"prediction_samples": [wandb.Image(img, caption=cap) for img, cap in zip(images, captions)]},
+                commit=False,
             )
         super().on_validation_batch_end(trainer, pl_module, outputs, batch, batch_idx, dataloader_idx)
 
@@ -72,7 +73,11 @@ class LogTrainingSamplesCallback(Callback):
         labels = [dm.idx2label[label_i.item()] for label_i in samples[1]]
 
         trainer.logger.experiment.log(
-            {"transformed_training_samples": [wandb.Image(img, cap) for img, cap in zip(list(samples[0]), labels)]},
+            {
+                "transformed_training_samples": [
+                    wandb.Image(img, caption=cap) for img, cap in zip(list(samples[0]), labels)
+                ]
+            },
             commit=False,
         )
         return super().on_train_start(trainer, pl_module)
