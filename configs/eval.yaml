@@ -15,6 +15,5 @@ defaults:
 task_name: "eval"
 
 tags: ["dev"]
-
 # passing checkpoint path is necessary for evaluation
-ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_10-15-15/checkpoints/last.ckpt
+# ckpt_path: out/train/runs/toy/toy_vitb16_visda2017_lp20/2023-03-21_10-15-15/checkpoints/last.ckpt

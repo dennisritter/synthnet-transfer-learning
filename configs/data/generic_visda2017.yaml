@@ -9,3 +9,5 @@ random_horizontal_flip: true
 random_vertical_flip: false
 random_color_jitter: true
 random_grayscale: true
+image_mean: [0.5, 0.5, 0.5]
+image_std: [0.5, 0.5, 0.5]

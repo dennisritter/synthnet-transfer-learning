@@ -1,5 +1,6 @@
 from typing import Any, List
 
+import numpy
 import torch
 from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric, MeanMetric
@@ -68,8 +69,12 @@ class VitModule(LightningModule):
 
     def model_step(self, batch: Any):
         x, y = batch
+        # print(x)
+        # if torch.isnan(x).any() or torch.isinf(x).any():
+        #     print('invalid input detected at iteration')
         logits = self.forward(x)["logits"]
         loss = self.criterion(logits, y)
+        # print(f"loss = {loss}")
         preds = torch.argmax(logits, dim=1)
         return loss, preds, y
 
