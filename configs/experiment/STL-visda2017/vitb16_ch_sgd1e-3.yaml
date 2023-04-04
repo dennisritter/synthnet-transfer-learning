@@ -22,7 +22,7 @@ trainer:
   max_epochs: 20
 
 model:
-  model_name: "google/vit-large-patch16-224-in21k"
+  model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.SGD
     lr: 0.001
