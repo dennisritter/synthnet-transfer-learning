@@ -34,11 +34,14 @@ model:
     _partial_: true
     lr: 0.1
     weight_decay: 0.01
+  # https://huggingface.co/docs/transformers/main_classes/optimizer_schedules?highlight=cosine#transformers.get_cosine_schedule_with_warmup
   scheduler:
-    _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+    _target_: transformers.get_cosine_schedule_with_warmup
     _partial_: true
-    T_max: ${trainer.max_epochs}
-    verbose: false
+    num_warmup_steps: 2
+    num_training_steps: ${trainer.max_epochs}
+    # num_cycles: 0.5
+    # last_epoch: -1
 
 logger:
   wandb:
@@ -46,8 +49,9 @@ logger:
     job_type: "fine tuning"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
-# data:
-#   toy: false
+
+data:
+  toy: true
 #   batch_size: 32
 #   num_workers: 8
 #   random_horizontal_flip: true

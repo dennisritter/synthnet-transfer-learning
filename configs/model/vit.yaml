@@ -9,10 +9,11 @@ optimizer:
   weight_decay: 0.1
 
 scheduler:
-  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  _partial_: true
-  T_max: ${trainer.max_epochs}
-  verbose: false
+  null
+  # _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  # _partial_: true
+  # T_max: ${trainer.max_epochs}
+  # verbose: false
 # scheduler:
 #   _target_: torch.optim.lr_scheduler.LinearLR
 #   _partial_: true
