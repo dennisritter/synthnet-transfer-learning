@@ -1,6 +1,6 @@
 _target_: datamodules.generic_finetune_dm.GenericFinetuneDM
 train_dir: ${paths.data_dir}modelnet10meshgrid-4x4/train
-# val_dir: ${paths.data_dir}visda2017/val
+val_dir: ${paths.data_dir}modelnet10meshgrid-4x4/test
 test_dir: ${paths.data_dir}modelnet10meshgrid-4x4/test
 batch_size: 8
 num_workers: 4
