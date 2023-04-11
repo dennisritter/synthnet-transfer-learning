@@ -1,0 +1,13 @@
+_target_: datamodules.generic_finetune_dm.GenericFinetuneDM
+train_dir: ${paths.data_dir}modelnet10meshgrid-4x4/train
+# val_dir: ${paths.data_dir}visda2017/val
+test_dir: ${paths.data_dir}modelnet10meshgrid-4x4/test
+batch_size: 8
+num_workers: 4
+toy: false
+random_horizontal_flip: false
+random_vertical_flip: false
+random_color_jitter: false
+random_grayscale: false
+image_mean: [0.5, 0.5, 0.5]
+image_std: [0.5, 0.5, 0.5]
