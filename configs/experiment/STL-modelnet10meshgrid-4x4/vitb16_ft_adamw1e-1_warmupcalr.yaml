@@ -49,9 +49,8 @@ logger:
     job_type: "fine tuning"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
-
-data:
-  toy: true
+# data:
+#   toy: true
 #   batch_size: 32
 #   num_workers: 8
 #   random_horizontal_flip: true
