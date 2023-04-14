@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-modelnet10meshgrid-4x4-vitb16-ch-swin
+  name: stl-modelnet10meshgrid-4x4-swinv2-ch
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-modelnet10meshgrid-4x4-vitb16-ch
+    - name: stl-modelnet10meshgrid-4x4-swinv2-ch
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
@@ -50,7 +50,7 @@ spec:
           # memory: 64
           # cpu: 16
   nodeSelector:
-    gpu: v100
+    gpu: a100
   volumes:
     - name: synthnet-finetuning-volume
       persistentVolumeClaim:

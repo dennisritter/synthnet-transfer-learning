@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-visda2017-vitb16-ch
+  name: stl-visda2017-swinv2-ch
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-visda2017-vitb16-ch
+    - name: stl-visda2017-swinv2-ch
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
@@ -43,12 +43,12 @@ spec:
           git pull;
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
-          python -u src/train.py -m 'experiment=STL-visda2017/vitb16_ch_sgd1e-3_augmix' data.toy=false data.batch_size=32;
+          python -u src/train.py -m 'experiment=STL-visda2017/swinv2_ch_sgd1e+1, STL-visda2017/swinv2_ch_sgd1e-1, STL-visda2017/swinv2_ch_sgd1e-3' data.toy=false data.batch_size=32;
       resources:
         limits:
           nvidia.com/gpu: 1
   nodeSelector:
-    gpu: v100
+    gpu: a100
   volumes:
     - name: synthnet-finetuning-volume
       persistentVolumeClaim:
