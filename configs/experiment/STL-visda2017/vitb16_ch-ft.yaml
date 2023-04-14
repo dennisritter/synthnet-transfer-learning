@@ -14,7 +14,7 @@ defaults:
 
 tags:
   [
-    "modelnet10meshgrid-4x4",
+    "visda2017",
     "vitb16",
     "fine tuning (CH-FT)",
     "transformers.get_cosine_schedule_with_warmup",
@@ -25,18 +25,18 @@ seed: 42
 
 trainer:
   min_epochs: 1
-  max_epochs: 100
+  max_epochs: 20
 
 model:
   # Load model from checkpoint (weights only)
   _target_: models.vit_module.VitModule.load_from_checkpoint
-  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-modelnet10meshgrid-4x4/vitb16_ch_sgd1e-1/2023-04-11_14-59-48/0/checkpoints/last.ckpt
+  checkpoint_path: out/[ENTER PATH]/last.ckpt #TODO
   model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
-    lr: 0.001
-    weight_decay: 0.01
+    lr: 0.001 #TODO
+    weight_decay: 0.1
   # https://huggingface.co/docs/transformers/main_classes/optimizer_schedules?highlight=cosine#transformers.get_cosine_schedule_with_warmup
   scheduler:
     _target_: transformers.get_cosine_schedule_with_warmup
@@ -48,15 +48,16 @@ model:
 
 logger:
   wandb:
-    project: STL-modelnet10meshgrid
+    project: STL-visda2017
     job_type: "fine tuning (CH-FT)"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
-# data:
-#   toy: false
-#   batch_size: 32
-#   num_workers: 8
-#   random_horizontal_flip: true
-#   random_vertical_flip: false
-#   random_color_jitter: true
-#   random_grayscale: true
+data:
+  #   toy: false
+  #   batch_size: 32
+  #   num_workers: 8
+  random_horizontal_flip: true
+  random_vertical_flip: false
+  random_color_jitter: true
+  random_grayscale: true
+  augmix: false
