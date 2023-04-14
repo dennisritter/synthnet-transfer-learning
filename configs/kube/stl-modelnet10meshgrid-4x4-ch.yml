@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-modelnet10meshgrid-4x4-swinv2-ch
+  name: stl-modelnet10meshgrid-4x4-convnextv2-ch
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-modelnet10meshgrid-4x4-swinv2-ch
+    - name: stl-modelnet10meshgrid-4x4-convnextv2-ch
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
@@ -43,7 +43,11 @@ spec:
           git pull;
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
-          python -u src/train.py -m 'experiment=STL-modelnet10meshgrid-4x4/swinv2_ch_sgd1e-1, STL-modelnet10meshgrid-4x4/swinv2_ch_sgd1e-3, STL-modelnet10meshgrid-4x4/swinv2_ch_sgd1e+1' data.toy=false data.batch_size=32;
+          python -u src/train.py -m 'experiment=
+          STL-modelnet10meshgrid-4x4/convnextv2_ch_sgd1e-1,
+          STL-modelnet10meshgrid-4x4/convnextv2_ch_sgd1e-3,
+          STL-modelnet10meshgrid-4x4/convnextv2_ch_sgd1e+1'
+          data.toy=false data.batch_size=32;
       resources:
         limits:
           nvidia.com/gpu: 1
