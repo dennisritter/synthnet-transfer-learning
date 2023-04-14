@@ -1,8 +1,5 @@
 # @package _global_
 
-# to execute this experiment run:
-# python train.py experiment=example
-
 defaults:
   - override /data: generic_modelnet10meshgrid-4x4.yaml
   - override /model: vit.yaml
@@ -52,12 +49,7 @@ logger:
     job_type: "fine tuning (CH-FT)"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
+
 data:
-  #   toy: false
-  #   batch_size: 32
-  #   num_workers: 8
-  random_horizontal_flip: true
-  random_vertical_flip: false
-  random_color_jitter: true
-  random_grayscale: true
-  augmix: false
+  image_size_h: 224
+  image_size_w: 224

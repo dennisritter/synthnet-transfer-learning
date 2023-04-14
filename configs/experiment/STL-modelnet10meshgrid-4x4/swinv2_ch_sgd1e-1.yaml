@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: generic_modelnet10meshgrid-4x4.yaml
-  - override /model: vit.yaml
+  - override /model: swinv2.yaml
   - override /callbacks: default_ch.yaml
   - override /trainer: default.yaml
 
@@ -12,7 +12,7 @@ defaults:
 tags:
   [
     "modelnet10meshgrid-4x4",
-    "vitb16",
+    "swinv2",
     "class head only",
     "SGD",
     "baseline augmentations",
@@ -25,10 +25,10 @@ trainer:
   max_epochs: 20
 
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
+  model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
   optimizer:
     _target_: torch.optim.SGD
-    lr: 0.001
+    lr: 0.1
     momentum: 0.9
     weight_decay: 0.0
   scheduler: null
@@ -41,5 +41,5 @@ logger:
     tags: ${tags}
 
 data:
-  image_size_h: 224
-  image_size_w: 224
+  image_size_h: 192
+  image_size_w: 192

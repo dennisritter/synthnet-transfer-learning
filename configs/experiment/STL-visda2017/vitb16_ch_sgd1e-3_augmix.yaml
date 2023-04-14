@@ -1,8 +1,5 @@
 # @package _global_
 
-# to execute this experiment run:
-# python train.py experiment=example
-
 defaults:
   - override /data: generic_visda2017.yaml
   - override /model: vit.yaml
@@ -36,10 +33,10 @@ logger:
     job_type: "class head only"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
+
 data:
-  #   toy: false
-  #   batch_size: 32
-  #   num_workers: 8
+  image_size_h: 224
+  image_size_w: 224
   random_horizontal_flip: true
   random_vertical_flip: false
   random_color_jitter: false
