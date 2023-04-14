@@ -4,7 +4,7 @@
 # python train.py experiment=example
 
 defaults:
-  - override /data: generic_visda2017.yaml
+  - override /data: generic_modelnet10meshgrid-4x4.yaml
   - override /model: vit.yaml
   - override /callbacks: default_ft.yaml
   - override /trainer: default.yaml
@@ -14,10 +14,10 @@ defaults:
 
 tags:
   [
-    "visda2017",
+    "modelnet10meshgrid-4x4",
     "vitb16",
     "fine tuning",
-    "CosineAnnealingLR",
+    "transformers.get_cosine_schedule_with_warmup",
     "baseline augmentations",
   ]
 
@@ -25,7 +25,7 @@ seed: 42
 
 trainer:
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 100
 
 model:
   model_name: "google/vit-base-patch16-224-in21k"
@@ -34,17 +34,18 @@ model:
     _partial_: true
     lr: 0.00001
     weight_decay: 0.01
+  # https://huggingface.co/docs/transformers/main_classes/optimizer_schedules?highlight=cosine#transformers.get_cosine_schedule_with_warmup
   scheduler:
     _target_: transformers.get_cosine_schedule_with_warmup
     _partial_: true
-    num_warmup_steps: 2
+    num_warmup_steps: 10
     num_training_steps: ${trainer.max_epochs}
     # num_cycles: 0.5
     # last_epoch: -1
 
 logger:
   wandb:
-    project: STL-visda2017
+    project: STL-modelnet10meshgrid
     job_type: "fine tuning"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
