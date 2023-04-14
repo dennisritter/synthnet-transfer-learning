@@ -16,9 +16,12 @@ class GenericFinetuneDM(pl.LightningDataModule):
         batch_size: int = 64,
         num_workers: int = 4,
         toy: bool = False,
-        image_size: tuple = (224, 224),
+        image_size_w: int = 224,
+        image_size_h: int = 224,
         image_mean: list = [0.5, 0.5, 0.5],
         image_std: list = [0.5, 0.5, 0.5],
+        random_resized_crop: bool = True,
+        center_crop: bool = False,
         random_horizontal_flip: bool = True,
         random_vertical_flip: bool = False,
         random_color_jitter: bool = False,
@@ -37,18 +40,29 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.toy = toy
-        self.image_size = image_size
+        self.image_size_w = image_size_w
+        self.image_size_h = image_size_h
+        self.image_size = (image_size_h, image_size_w)
         self.image_mean = image_mean
         self.image_std = image_std
+        self.random_resized_crop = random_resized_crop
+        self.center_crop = center_crop
         self.random_horizontal_flip = random_horizontal_flip
         self.random_vertical_flip = random_vertical_flip
         self.random_color_jitter = random_color_jitter
         self.random_grayscale = random_grayscale
         self.augmix = augmix
 
+        assert random_resized_crop != center_crop
+        assert augmix != random_grayscale
+        assert augmix != random_color_jitter
+
         self.train_transform = transforms.Compose(
             [
-                transforms.RandomResizedCrop(self.image_size, scale=(0.7, 1.0)),
+                transforms.RandomApply(
+                    [transforms.RandomResizedCrop(self.image_size, scale=(0.7, 1.0))], p=int(self.random_resized_crop)
+                ),
+                transforms.RandomApply([transforms.CenterCrop(self.image_size)], p=int(self.center_crop)),
                 transforms.RandomApply([transforms.RandomHorizontalFlip()], p=int(self.random_horizontal_flip)),
                 transforms.RandomApply([transforms.RandomVerticalFlip()], p=int(self.random_vertical_flip)),
                 transforms.RandomApply(
