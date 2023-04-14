@@ -1,4 +1,4 @@
-_target_: models.swin_module.SwinV2Module
+_target_: models.swinv2_module.SwinV2Module
 
 model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
 
