@@ -23,6 +23,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         random_vertical_flip: bool = False,
         random_color_jitter: bool = False,
         random_grayscale: bool = False,
+        augmix: bool = False,
     ):
         super().__init__()
 
@@ -43,6 +44,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.random_vertical_flip = random_vertical_flip
         self.random_color_jitter = random_color_jitter
         self.random_grayscale = random_grayscale
+        self.augmix = augmix
 
         self.train_transform = transforms.Compose(
             [
@@ -54,6 +56,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
                     p=int(self.random_color_jitter),
                 ),
                 transforms.RandomApply([transforms.RandomGrayscale()], p=int(self.random_grayscale)),
+                transforms.RandomApply([transforms.AugMix()], p=int(self.augmix)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=self.image_mean, std=self.image_std),
             ]
