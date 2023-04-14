@@ -43,7 +43,7 @@ spec:
           git pull;
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
-          python -u src/train.py -m 'experiment=STL-modelnet10meshgrid-4x4/vitb16_ft_adamw1e-3_warmupcalr_100e, STL-modelnet10meshgrid-4x4/vitb16_ft_adamw1e-5_warmupcalr_100e' data.toy=false data.batch_size=32 trainer.max_epochs=100;
+          python -u src/train.py -m 'experiment=STL-modelnet10meshgrid-4x4/vitb16_ft_adamw1e-1_warmupcalr, STL-modelnet10meshgrid-4x4/vitb16_ft_adamw1e-3_warmupcalr, STL-modelnet10meshgrid-4x4/vitb16_ft_adamw1e-5_warmupcalr' data.toy=false data.batch_size=32;
       resources:
         limits:
           nvidia.com/gpu: 1
