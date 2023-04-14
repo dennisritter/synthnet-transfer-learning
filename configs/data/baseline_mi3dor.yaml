@@ -1,8 +1,0 @@
-_target_: datamodules.baseline_finetune_dm.BaselineFinetuneDM
-train_dir: ${paths.data_dir}mi3dor/train
-# val_dir: ${paths.data_dir}mi3dor/val
-test_dir: ${paths.data_dir}mi3dor/test
-batch_size: 64
-# train_val_test_split: [55_000, 5_000, 10_000]
-num_workers: 4
-# pin_memory: False
