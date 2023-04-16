@@ -54,8 +54,8 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.augmix = augmix
 
         assert random_resized_crop != center_crop
-        assert augmix != random_grayscale
-        assert augmix != random_color_jitter
+        # assert augmix != random_grayscale # todo
+        # assert augmix != random_color_jitter
 
         self.train_transform = transforms.Compose(
             [
