@@ -47,7 +47,6 @@ spec:
           STL-visda2017/convnextv2_ch_sgd1e+1,
           STL-visda2017/convnextv2_ch_sgd1e-1,
           STL-visda2017/convnextv2_ch_sgd1e-3'
-          data.toy=false data.batch_size=32;
       resources:
         limits:
           nvidia.com/gpu: 1

@@ -47,7 +47,6 @@ spec:
           STL-visda2017/convnextv2_ft_adamw1e-1_warmupcalr,
           STL-visda2017/convnextv2_ft_adamw1e-3_warmupcalr,
           STL-visda2017/convnextv2_ft_adamw1e-5_warmupcalr'
-          data.toy=false data.batch_size=32;
       resources:
         limits:
           nvidia.com/gpu: 1
