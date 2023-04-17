@@ -29,7 +29,7 @@ model:
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
-    lr: 0.001
+    lr: 0.00001
     weight_decay: 0.01
   # https://huggingface.co/docs/transformers/main_classes/optimizer_schedules?highlight=cosine#transformers.get_cosine_schedule_with_warmup
   scheduler:
