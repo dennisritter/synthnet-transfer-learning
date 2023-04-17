@@ -94,6 +94,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
             self.train = ImageFolder(self.train_dir)
             self.val = ImageFolder(self.val_dir)
         else:
+            # TODO: FIX TRANSFORMS
             self.train, self.val = random_split(ImageFolder(self.train_dir), [0.8, 0.2])
             self.train = self.train.dataset
             self.val = self.val.dataset
