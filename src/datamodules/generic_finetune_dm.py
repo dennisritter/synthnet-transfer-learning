@@ -20,6 +20,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         image_size_h: int = 224,
         image_mean: list = [0.5, 0.5, 0.5],
         image_std: list = [0.5, 0.5, 0.5],
+        resize: bool = False,
         random_resized_crop: bool = True,
         center_crop: bool = False,
         random_horizontal_flip: bool = True,
@@ -45,6 +46,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.image_size = (image_size_h, image_size_w)
         self.image_mean = image_mean
         self.image_std = image_std
+        self.resize = resize
         self.random_resized_crop = random_resized_crop
         self.center_crop = center_crop
         self.random_horizontal_flip = random_horizontal_flip
@@ -59,6 +61,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
 
         self.train_transform = transforms.Compose(
             [
+                transforms.RandomApply([transforms.Resize(self.image_size)], p=int(self.resize)),
                 transforms.RandomApply(
                     [transforms.RandomResizedCrop(self.image_size, scale=(0.7, 1.0))], p=int(self.random_resized_crop)
                 ),

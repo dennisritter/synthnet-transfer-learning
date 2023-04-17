@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-modelnet10meshgrid-4x4-convnextv2-ft-e100
+  name: stl-modelnet10meshgrid-4x4-ft
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-modelnet10meshgrid-4x4-convnextv2-ft-e100
+    - name: stl-modelnet10meshgrid-4x4-ft
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
@@ -53,14 +53,13 @@ spec:
           STL-modelnet10meshgrid-4x4/convnextv2_ft_adamw1e-1_warmupcalr,
           STL-modelnet10meshgrid-4x4/convnextv2_ft_adamw1e-3_warmupcalr,
           STL-modelnet10meshgrid-4x4/convnextv2_ft_adamw1e-5_warmupcalr'
-          trainer.max_epochs=20 model.scheduler.num_warmup_steps=2;
       resources:
         limits:
           nvidia.com/gpu: 1
           # memory: 64
           # cpu: 16
   nodeSelector:
-    gpu: a100
+    gpu: v100
   volumes:
     - name: synthnet-finetuning-volume
       persistentVolumeClaim:
