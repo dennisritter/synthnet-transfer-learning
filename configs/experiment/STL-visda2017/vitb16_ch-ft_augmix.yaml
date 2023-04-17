@@ -10,14 +10,7 @@ defaults:
 # this allows you to overwrite only specified parameters
 
 tags:
-  [
-    "visda2017",
-    "vitb16",
-    "fine tuning",
-    "CosineAnnealingLR",
-    "vitb16_ch_sgd1e-3",
-    "vitb16_ft_adamw1e-5_warmupcalr_augmix",
-  ]
+  ["visda2017", "vitb16", "fine tuning (CH-FT)", "CosineAnnealingLR", "augmix"]
 
 seed: 42
 
@@ -26,6 +19,9 @@ trainer:
   max_epochs: 20
 
 model:
+  # Load model from checkpoint (weights only)
+  _target_: models.vit_module.VitModule.load_from_checkpoint
+  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_ch_sgd1e-3/2023-04-04_17-15-55/2/checkpoints/last.ckpt
   model_name: "google/vit-base-patch16-224-in21k"
   optimizer:
     _target_: torch.optim.AdamW
