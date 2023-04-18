@@ -55,10 +55,6 @@ class GenericFinetuneDM(pl.LightningDataModule):
         self.random_grayscale = random_grayscale
         self.augmix = augmix
 
-        # assert random_resized_crop != center_crop # todo
-        # assert augmix != random_grayscale
-        # assert augmix != random_color_jitter
-
         self.train_transform = transforms.Compose(
             [
                 transforms.RandomApply([transforms.Resize(self.image_size)], p=int(self.resize)),
@@ -94,7 +90,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
             self.train = ImageFolder(self.train_dir)
             self.val = ImageFolder(self.val_dir)
         else:
-            # TODO: FIX TRANSFORMS
+            # TODO: FIX TRANSFORMS - train and val access the same dataset. Results in train_transforms not applied!
             self.train, self.val = random_split(ImageFolder(self.train_dir), [0.8, 0.2])
             self.train = self.train.dataset
             self.val = self.val.dataset
