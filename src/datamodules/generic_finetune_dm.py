@@ -91,9 +91,12 @@ class GenericFinetuneDM(pl.LightningDataModule):
             self.val = ImageFolder(self.val_dir)
         else:
             # TODO: FIX TRANSFORMS - train and val access the same dataset. Results in train_transforms not applied!
-            self.train, self.val = random_split(ImageFolder(self.train_dir), [0.8, 0.2])
-            self.train = self.train.dataset
-            self.val = self.val.dataset
+            # TODO: Research: how to split from train set but using different transforms?
+            # self.train, self.val = random_split(ImageFolder(self.train_dir), [0.8, 0.2])
+            self.train = ImageFolder(self.train_dir)
+            # NOTE: use TEST SET for validation
+            self.val = ImageFolder(self.test_dir)
+
         self.test = ImageFolder(self.test_dir)
 
         self.train.transform = self.train_transform
