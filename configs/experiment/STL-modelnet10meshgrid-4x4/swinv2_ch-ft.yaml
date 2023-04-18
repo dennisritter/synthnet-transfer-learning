@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: generic_modelnet10meshgrid-4x4.yaml
-  - override /model: vit.yaml
+  - override /model: swinv2.yaml
   - override /callbacks: default_ft.yaml
   - override /trainer: default.yaml
 
@@ -12,7 +12,7 @@ defaults:
 tags:
   [
     "modelnet10meshgrid-4x4",
-    "vitb16",
+    "swinv2",
     "fine tuning (CH-FT)",
     "transformers.get_cosine_schedule_with_warmup",
     "baseline augmentations",
@@ -26,9 +26,9 @@ trainer:
 
 model:
   # Load model from checkpoint (weights only)
-  _target_: models.vit_module.VitModule.load_from_checkpoint
-  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-modelnet10meshgrid-4x4/vitb16_ch_sgd1e-1/2023-04-11_14-59-48/0/checkpoints/last.ckpt
-  model_name: "google/vit-base-patch16-224-in21k"
+  _target_: models.swinv2_module.SwinV2Module.load_from_checkpoint
+  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-modelnet10meshgrid-4x4/swinv2_ch_sgd1e-3/2023-04-18_09-58-22/1/checkpoints/last.ckpt
+  model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
