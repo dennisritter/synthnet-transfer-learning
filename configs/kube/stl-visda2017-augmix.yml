@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-visda2017-vitb16-ch-augmix
+  name: stl-visda2017-vitb16-ft-augmix
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-visda2017-vitb16-ch-augmix
+    - name: stl-visda2017-vitb16-ft-augmix
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
