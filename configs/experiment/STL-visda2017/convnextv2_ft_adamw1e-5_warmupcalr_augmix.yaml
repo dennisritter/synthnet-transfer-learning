@@ -2,14 +2,14 @@
 
 defaults:
   - override /data: generic_visda2017.yaml
-  - override /model: vit.yaml
+  - override /model: convnextv2.yaml
   - override /callbacks: default_ft.yaml
   - override /trainer: default.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["visda2017", "vitb16", "fine tuning", "CosineAnnealingLR", "augmix"]
+tags: ["visda2017", "convnextv2", "fine tuning", "CosineAnnealingLR", "augmix"]
 
 seed: 42
 
@@ -18,7 +18,7 @@ trainer:
   max_epochs: 20
 
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
+  model_name: "facebook/convnextv2-base-22k-224"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
