@@ -51,7 +51,7 @@ spec:
         limits:
           nvidia.com/gpu: 1
   nodeSelector:
-    gpu: v100
+    gpu: a100
   volumes:
     - name: synthnet-finetuning-volume
       persistentVolumeClaim:

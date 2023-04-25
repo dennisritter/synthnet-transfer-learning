@@ -22,8 +22,19 @@ class FreezeAllButLast(BaseFinetuning):
             param.requires_grad = False
 
         # TODO: Make generic or add model name to know how to select last layers
-        pl_module.net.classifier.weight.requires_grad = True
-        pl_module.net.classifier.bias.requires_grad = True
+        # TODO: Make generic or add model name to know how to select last layers
+        # For most models. Ohne classification layer named classifier
+        if hasattr(pl_module.net, "classifier"):
+            pl_module.net.classifier.weight.requires_grad = True
+            pl_module.net.classifier.bias.requires_grad = True
+        # Deit: Distillation and CLS classifier
+        if hasattr(pl_module.net, "cls_classifier"):
+            pl_module.net.cls_classifier.weight.requires_grad = True
+            pl_module.net.cls_classifier.bias.requires_grad = True
+        # Deit: Distillation and CLS classifier
+        if hasattr(pl_module.net, "cls_classifier"):
+            pl_module.net.distillation_classifier.weight.requires_grad = True
+            pl_module.net.distillation_classifier.bias.requires_grad = True
 
         for name, param in pl_module.net.named_parameters():
             log.debug(f"{name}: requires_grad={param.requires_grad}")
