@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: generic_visda2017.yaml
-  - override /model: vit.yaml
+  - override /model: convnextv2.yaml
   - override /callbacks: default_ft.yaml
   - override /trainer: default.yaml
 
@@ -10,7 +10,13 @@ defaults:
 # this allows you to overwrite only specified parameters
 
 tags:
-  ["visda2017", "vitb16", "fine tuning (CH-FT)", "CosineAnnealingLR", "augmix"]
+  [
+    "visda2017",
+    "convnextv2",
+    "fine tuning (CH-FT)",
+    "CosineAnnealingLR",
+    "augmix",
+  ]
 
 seed: 42
 
@@ -20,9 +26,9 @@ trainer:
 
 model:
   # Load model from checkpoint (weights only)
-  _target_: models.vit_module.VitModule.load_from_checkpoint
-  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_ch_sgd1e-3/2023-04-21_14-13-45/2/checkpoints/last.ckpt
-  model_name: "google/vit-base-patch16-224-in21k"
+  _target_: models.convnextv2_module.ConvNextV2Module.load_from_checkpoint
+  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/convnextv2_ch_sgd1e-3/2023-04-21_14-13-45/8/checkpoints/last.ckpt
+  model_name: "facebook/convnextv2-base-22k-224"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
