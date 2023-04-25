@@ -21,7 +21,7 @@ trainer:
 model:
   # Load model from checkpoint (weights only)
   _target_: models.deit_module.DeitModule.load_from_checkpoint
-  checkpoint_path: out//last.ckpt
+  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/deit_ch_sgd1e-3/2023-04-25_10-53-56/2/checkpoints/last.ckpt
   model_name: "facebook/deit-base-distilled-patch16-224"
   optimizer:
     _target_: torch.optim.AdamW
