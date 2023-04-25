@@ -47,5 +47,5 @@ logger:
     tags: ${tags}
 
 data:
-  image_size_h: 192
-  image_size_w: 192
+  image_size_h: 224
+  image_size_w: 224

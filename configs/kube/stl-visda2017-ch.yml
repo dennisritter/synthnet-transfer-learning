@@ -46,8 +46,7 @@ spec:
           python -u src/train.py -m 'experiment=
           STL-visda2017/deit_ch_sgd1e+1,
           STL-visda2017/deit_ch_sgd1e-1,
-          STL-visda2017/deit_ch_sgd1e-3,
-          STL-visda2017/deit_ch_sgd1e-3_augmix'
+          STL-visda2017/deit_ch_sgd1e-3'
       resources:
         limits:
           nvidia.com/gpu: 1

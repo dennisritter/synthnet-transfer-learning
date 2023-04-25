@@ -46,8 +46,7 @@ spec:
           python -u src/train.py -m 'experiment=
           STL-visda2017/deit_ft_adamw1e-1_warmupcalr,
           STL-visda2017/deit_ft_adamw1e-3_warmupcalr,
-          STL-visda2017/deit_ft_adamw1e-5_warmupcalr,
-          STL-visda2017/deit_ft_adamw1e-5_warmupcalr_augmix'
+          STL-visda2017/deit_ft_adamw1e-5_warmupcalr'
       resources:
         limits:
           nvidia.com/gpu: 1
