@@ -77,20 +77,18 @@ class VitCDANModule(LightningModule):
 
     def model_step(self, batch: Any):
         x, y = batch
-        # TODO CONTINUE HERE
+
         logits_classifier = self.forward(x)["logits"]
         loss_classifier = self.criterion_classifier(logits_classifier, y)
         preds_classifier = torch.argmax(logits_classifier, dim=1)
 
-        loss_domaindiscriminator = self.criterion_domaindiscriminator()
-        loss = loss_classifier + loss_domaindiscriminator
-        return loss, loss_classifier, loss_domaindiscriminator, preds_classifier, y
+        return loss_classifier, preds_classifier, y
 
     def training_step(self, batch: Any, batch_idx: int):
-        loss, loss_classifier, loss_domaindiscriminator, preds, targets = self.model_step(batch)
-
+        loss_classifier, preds, targets = self.model_step(batch)
+        loss_domaindiscriminator = self.criterion_domaindiscriminator()
         # update and log metrics
-        self.train_loss(loss)
+        self.train_loss(loss_classifier)
         self.train_loss_classifier(loss_classifier)
         self.train_loss_domaindiscriminator(loss_domaindiscriminator)
         self.train_acc(preds, targets)
@@ -102,7 +100,13 @@ class VitCDANModule(LightningModule):
         # we can return here dict with any tensors
         # and then read it in some callback or in `training_epoch_end()` below
         # remember to always return loss from `training_step()` or backpropagation will fail!
-        return {"loss": loss, "preds": preds, "targets": targets}
+        return {
+            "loss": loss_classifier,
+            "loss_classifier": loss_classifier,
+            "loss_domaindiscriminator": loss_domaindiscriminator,
+            "preds": preds,
+            "targets": targets,
+        }
 
     def on_training_epoch_end(self):
         # `outputs` is a list of dicts returned from `training_step()`
