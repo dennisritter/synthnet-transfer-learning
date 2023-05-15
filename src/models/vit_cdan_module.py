@@ -44,12 +44,10 @@ class VitCDANModule(LightningModule):
             ignore_mismatched_sizes=True,
         )
         self.class_head = self.net.classifier
-        self.domaindiscriminator = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=768)
+        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=768)
 
         # loss function
-        self.criterion_domaindiscriminator = ConditionalDomainAdversarialLoss(
-            self.domaindiscriminator, reduction="mean"
-        )
+        self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
         self.criterion_classifier = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
@@ -59,7 +57,7 @@ class VitCDANModule(LightningModule):
 
         # for averaging loss across batches
         self.train_loss_classifier = MeanMetric()
-        self.train_loss_domaindiscriminator = MeanMetric()
+        self.train_loss_ddisc = MeanMetric()
         self.train_loss = MeanMetric()
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
@@ -78,22 +76,31 @@ class VitCDANModule(LightningModule):
     def model_step(self, batch: Any):
         x, y = batch
 
-        logits_classifier = self.forward(x)["logits"]
+        output_classifier = self.forward(x)
+        logits_classifier = output_classifier["logits"]
+        features_classifier = output_classifier["last_hidden_state"]
         loss_classifier = self.criterion_classifier(logits_classifier, y)
         preds_classifier = torch.argmax(logits_classifier, dim=1)
 
-        return loss_classifier, preds_classifier, y
+        return loss_classifier, preds_classifier, logits_classifier, features_classifier, y
 
     def training_step(self, batch: Any, batch_idx: int):
-        loss_classifier, preds, targets = self.model_step(batch)
-        loss_domaindiscriminator = self.criterion_domaindiscriminator()
+        loss_classifier, src_preds, src_logits, src_features, src_targets = self.model_step(batch)
+
+        # target_x, target_y = batch #! How to load target data?
+        target_net_output = None  # REMOVE
+        # target_net_output = self.forward(target_x) # UNCOMMENT
+        target_logits, target_features = target_net_output["logits"], target_net_output["last_hidden_state"]
+
+        loss_ddisc = self.criterion_ddisc(src_logits, src_features, target_logits, target_features)
+
         # update and log metrics
-        self.train_loss(loss_classifier)
         self.train_loss_classifier(loss_classifier)
-        self.train_loss_domaindiscriminator(loss_domaindiscriminator)
-        self.train_acc(preds, targets)
+        self.train_loss_ddisc(loss_ddisc)
+        self.train_loss(loss_classifier + loss_ddisc)
+        self.train_acc(src_preds, src_targets)
         self.log("train/loss", self.train_loss_classifier, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("train/loss", self.train_loss_domaindiscriminator, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/loss", self.train_loss_ddisc, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
 
@@ -102,10 +109,8 @@ class VitCDANModule(LightningModule):
         # remember to always return loss from `training_step()` or backpropagation will fail!
         return {
             "loss": loss_classifier,
-            "loss_classifier": loss_classifier,
-            "loss_domaindiscriminator": loss_domaindiscriminator,
-            "preds": preds,
-            "targets": targets,
+            "preds": src_preds,
+            "targets": src_targets,
         }
 
     def on_training_epoch_end(self):
@@ -121,7 +126,7 @@ class VitCDANModule(LightningModule):
         pass
 
     def validation_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.val_loss(loss)
@@ -139,7 +144,7 @@ class VitCDANModule(LightningModule):
         self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True)
 
     def test_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.test_loss(loss)
