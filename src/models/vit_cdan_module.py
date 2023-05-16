@@ -76,6 +76,7 @@ class VitCDANModule(LightningModule):
         self.val_acc_best.reset()
 
     def model_step(self, batch_src: Any):
+        # TODO: python src/train.py -m 'experiment=STL-visda2017/vitb16_cdan' data.batch_size=8 trainer.max_epochs=5
         x, y = batch_src
 
         output_classifier = self.forward(x)
