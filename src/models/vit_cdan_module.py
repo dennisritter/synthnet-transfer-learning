@@ -73,8 +73,8 @@ class VitCDANModule(LightningModule):
         # so we need to make sure val_acc_best doesn't store accuracy from these checks
         self.val_acc_best.reset()
 
-    def model_step(self, batch: Any):
-        x, y = batch
+    def model_step(self, batch_src: Any):
+        x, y = batch_src
 
         output_classifier = self.forward(x)
         logits_classifier = output_classifier["logits"]
@@ -85,13 +85,15 @@ class VitCDANModule(LightningModule):
         return loss_classifier, preds_classifier, logits_classifier, features_classifier, y
 
     def training_step(self, batch: Any, batch_idx: int):
-        loss_classifier, src_preds, src_logits, src_features, src_targets = self.model_step(batch)
+        # NOTE: We expect a batch from MultiDataParallelLoader, which is a custom dataloader that
+        #       collates data from multiple datasets in parallel
+        #       In our use case this represents SOURCE and TARGET domain data for domain adaptation.
 
-        # target_x, target_y = batch #! How to load target data?
-        target_net_output = None  # REMOVE
-        # target_net_output = self.forward(target_x) # UNCOMMENT
+        batch_src, batch_target = batch
+        loss_classifier, src_preds, src_logits, src_features, src_targets = self.model_step(batch_src)
+        x_target, y_target = batch_target
+        target_net_output = self.forward(x_target)
         target_logits, target_features = target_net_output["logits"], target_net_output["last_hidden_state"]
-
         loss_ddisc = self.criterion_ddisc(src_logits, src_features, target_logits, target_features)
 
         # update and log metrics
