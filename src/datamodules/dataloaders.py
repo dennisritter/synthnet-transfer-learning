@@ -1,7 +1,7 @@
 """Implements custom dataloaders."""
 
 
-class MultiDataLoader:
+class MultiDataParallelLoader:
     """Batch Sampler for a MultiDataset.
 
     Iterates in parallel over different batch samplers for each dataset. Yields batches [(x_1, y_1), ..., (x_n, y_n)]
