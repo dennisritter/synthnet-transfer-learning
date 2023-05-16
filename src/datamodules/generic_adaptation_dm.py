@@ -113,19 +113,18 @@ class GenericAdaptationDM(pl.LightningDataModule):
         # Use 80 samples for training and 20 for testing
         if self.toy:
             self.train_src = [
-                Subset(train_src_ds, np.random.choice(np.arange(len(self.train)), size=80, replace=False))
+                Subset(train_src_ds, np.random.choice(np.arange(len(train_src_ds)), size=80, replace=False))
                 for train_src_ds in self.train_src
             ]
             self.train_target = [
-                Subset(train_src_ds, np.random.choice(np.arange(len(self.train)), size=80, replace=False))
-                for train_src_ds in self.train_target
+                Subset(train_target_ds, np.random.choice(np.arange(len(train_target_ds)), size=80, replace=False))
+                for train_target_ds in self.train_target
             ]
             self.val = [
-                Subset(val_ds, np.random.choice(np.arange(len(self.val)), size=80, replace=False))
-                for val_ds in self.val
+                Subset(val_ds, np.random.choice(np.arange(len(val_ds)), size=80, replace=False)) for val_ds in self.val
             ]
             self.test = [
-                Subset(test_ds, np.random.choice(np.arange(len(self.test)), size=80, replace=False))
+                Subset(test_ds, np.random.choice(np.arange(len(test_ds)), size=80, replace=False))
                 for test_ds in self.test
             ]
 
