@@ -94,6 +94,40 @@ class LogTrainingSamplesCallback(Callback):
         return super().on_train_start(trainer, pl_module)
 
 
+class LogTrainingSamplesMultiDataParallelLoaderCallback(Callback):
+    def __init__(self, n: int = 4):
+        super().__init__()
+        self.n = n
+
+    def on_train_start(self, trainer, pl_module) -> None:
+        dm = trainer.datamodule
+        # TODO: Probably needs fix after MultiConcatDataLoader is implemented
+        loader = DataLoader(dataset=dm.train_src[0], batch_size=self.n, num_workers=0, shuffle=True)
+        samples = next(iter(loader))
+        labels = [dm.idx2label[label_i.item()] for label_i in samples[1]]
+        trainer.logger.experiment.log(
+            {
+                "transformed_training_samples_source": [
+                    wandb.Image(img, caption=cap) for img, cap in zip(list(samples[0]), labels)
+                ]
+            },
+            commit=False,
+        )
+
+        loader = DataLoader(dataset=dm.train_target[0], batch_size=self.n, num_workers=0, shuffle=True)
+        samples = next(iter(loader))
+        labels = [dm.idx2label[label_i.item()] for label_i in samples[1]]
+        trainer.logger.experiment.log(
+            {
+                "transformed_training_samples_target": [
+                    wandb.Image(img, caption=cap) for img, cap in zip(list(samples[0]), labels)
+                ]
+            },
+            commit=False,
+        )
+        return super().on_train_start(trainer, pl_module)
+
+
 class LogLayersRequiresGrad(Callback):
     def __init__(self):
         super().__init__()
