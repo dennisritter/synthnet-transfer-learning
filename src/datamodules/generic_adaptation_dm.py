@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
-from src.datamodules.dataloaders import MultiDataParallelLoader
+from datamodules.dataloaders import MultiDataParallelLoader
 
 
 class GenericAdaptationDM(pl.LightningDataModule):

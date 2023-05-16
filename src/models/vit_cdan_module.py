@@ -42,6 +42,8 @@ class VitCDANModule(LightningModule):
             model_name,
             num_labels=num_classes,
             ignore_mismatched_sizes=True,
+            output_hidden_states=True,
+            output_attentions=True,
         )
         self.class_head = self.net.classifier
         self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=768)
@@ -78,7 +80,7 @@ class VitCDANModule(LightningModule):
 
         output_classifier = self.forward(x)
         logits_classifier = output_classifier["logits"]
-        features_classifier = output_classifier["last_hidden_state"]
+        features_classifier = output_classifier["hidden_states"][-1][:, 0, :]
         loss_classifier = self.criterion_classifier(logits_classifier, y)
         preds_classifier = torch.argmax(logits_classifier, dim=1)
 
@@ -93,7 +95,7 @@ class VitCDANModule(LightningModule):
         loss_classifier, src_preds, src_logits, src_features, src_targets = self.model_step(batch_src)
         x_target, y_target = batch_target
         target_net_output = self.forward(x_target)
-        target_logits, target_features = target_net_output["logits"], target_net_output["last_hidden_state"]
+        target_logits, target_features = target_net_output["logits"], target_net_output["hidden_states"][-1][:, 0, :]
         loss_ddisc = self.criterion_ddisc(src_logits, src_features, target_logits, target_features)
 
         # update and log metrics
