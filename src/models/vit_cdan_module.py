@@ -3,11 +3,12 @@ from typing import Any, List
 import numpy
 import torch
 from pytorch_lightning import LightningModule
-from tllib.alignment.cdan import ConditionalDomainAdversarialLoss
-from tllib.modules.domain_discriminator import DomainDiscriminator
 from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 from transformers import AutoFeatureExtractor, AutoModelForImageClassification
+
+from tllib.alignment.cdan import ConditionalDomainAdversarialLoss
+from tllib.modules.domain_discriminator import DomainDiscriminator
 
 
 class VitCDANModule(LightningModule):
@@ -46,10 +47,12 @@ class VitCDANModule(LightningModule):
             output_attentions=True,
         )
         self.class_head = self.net.classifier
-        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
+        # self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
 
         # loss function
-        self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
+        self.criterion_ddisc = ConditionalDomainAdversarialLoss(
+            DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False), reduction="mean"
+        )
         self.criterion_classifier = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
