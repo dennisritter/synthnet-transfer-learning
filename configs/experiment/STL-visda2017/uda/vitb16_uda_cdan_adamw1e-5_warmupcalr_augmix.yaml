@@ -10,7 +10,14 @@ defaults:
 # this allows you to overwrite only specified parameters
 
 tags:
-  ["visda2017", "vitb16", "Adaptation", "CDAN", "CosineAnnealingLR", "augmix"]
+  [
+    "visda2017",
+    "vitb16",
+    "Domain Adaptation",
+    "CDAN",
+    "CosineAnnealingLR",
+    "augmix",
+  ]
 
 seed: 42
 
@@ -35,8 +42,8 @@ model:
 
 logger:
   wandb:
-    project: CDAN-TEST
-    job_type: "Adaptation"
+    project: STL-visda2017
+    job_type: "Domain Adaptation"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
 
