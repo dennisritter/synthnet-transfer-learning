@@ -3,14 +3,21 @@
 defaults:
   - override /data: generic_visda2017.yaml
   - override /model: vit_cdan.yaml
-  - override /callbacks: default_ft.yaml
+  - override /callbacks: default_ada.yaml
   - override /trainer: default.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
 tags:
-  ["visda2017", "vitb16", "fine tuning (CH-FT)", "CosineAnnealingLR", "augmix"]
+  [
+    "visda2017",
+    "vitb16",
+    "Domain Adaptation",
+    "CDAN",
+    "CosineAnnealingLR",
+    "augmix",
+  ]
 
 seed: 42
 
