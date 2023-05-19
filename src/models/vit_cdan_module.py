@@ -46,7 +46,7 @@ class VitCDANModule(LightningModule):
             output_attentions=True,
         )
         self.class_head = self.net.classifier
-        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=768)
+        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
 
         # loss function
         self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
@@ -104,8 +104,8 @@ class VitCDANModule(LightningModule):
         self.train_loss_ddisc(loss_ddisc)
         self.train_loss(loss_classifier + loss_ddisc)
         self.train_acc(src_preds, src_targets)
-        self.log("train/loss", self.train_loss_classifier, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("train/loss", self.train_loss_ddisc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/loss_classifier", self.train_loss_classifier, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/loss_ddisc", self.train_loss_ddisc, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
 

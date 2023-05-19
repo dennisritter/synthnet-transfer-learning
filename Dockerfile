@@ -16,7 +16,8 @@ RUN apt update && \
     pip install omegaconf && \
     pip install hydra-core && \
     pip install hydra-colorlog \
-    pip install rich
+    pip install rich \
+    pip install numba
 
 RUN apt-get -y install git
 
