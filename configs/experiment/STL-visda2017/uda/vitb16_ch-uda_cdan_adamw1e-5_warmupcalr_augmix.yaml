@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /data: generic_visda2017.yaml
+  - override /data: adaptation_visda2017.yaml
   - override /model: vit_cdan.yaml
   - override /callbacks: default_ada.yaml
   - override /trainer: default.yaml
