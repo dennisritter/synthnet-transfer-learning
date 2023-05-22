@@ -58,6 +58,7 @@ class VitCDANModule(LightningModule):
             output_hidden_states=True,
             output_attentions=True,
         )
+        self.net.load_state_dict(vit_weights_rn)
 
         self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
 
