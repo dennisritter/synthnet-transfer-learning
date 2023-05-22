@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: generic_visda2017.yaml
-  - override /model: swinv2.yaml
+  - override /model: vit.yaml
   - override /callbacks: default_ch.yaml
   - override /trainer: default.yaml
 

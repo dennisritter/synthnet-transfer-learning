@@ -9,7 +9,7 @@ from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
 
 class VitModule(LightningModule):
-    """Example of LightningModule for Vit classification.
+    """Example of LightningModule for Vision Transformer Image classification.
 
     A LightningModule organizes your PyTorch code into 6 sections:
         - Computations (init)
@@ -41,8 +41,6 @@ class VitModule(LightningModule):
             num_labels=num_classes,
             ignore_mismatched_sizes=True,
         )
-        self.class_head = self.net.classifier
-
         # loss function
         self.criterion = torch.nn.CrossEntropyLoss()
 

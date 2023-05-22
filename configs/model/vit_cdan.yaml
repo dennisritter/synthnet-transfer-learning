@@ -5,8 +5,8 @@ model_name: "google/vit-base-patch16-224-in21k"
 optimizer:
   _target_: torch.optim.AdamW
   _partial_: true
-  lr: 0.001
-  weight_decay: 0.1
+  lr: 0.00001
+  weight_decay: 0.01
 
 scheduler:
   null

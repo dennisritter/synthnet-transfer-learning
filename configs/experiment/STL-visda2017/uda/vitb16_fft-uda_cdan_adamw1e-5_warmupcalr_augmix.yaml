@@ -40,6 +40,8 @@ model:
     num_training_steps: ${trainer.max_epochs}
     # num_cycles: 0.5
     # last_epoch: -1
+  cdan_ddisc_in_feature: 768
+  cdan_ddisc_hidden_size: 1024
 
 logger:
   wandb:
