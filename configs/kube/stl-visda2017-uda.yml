@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-visda2017-swinv2-uda-cdan
+  name: stl-visda2017-vit-uda-cdan-e
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-visda2017-swinv2-uda-cdan
+    - name: stl-visda2017-vit-uda-cdan-e
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
