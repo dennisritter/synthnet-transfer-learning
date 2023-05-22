@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Any, List
 
 import numpy
@@ -32,6 +33,7 @@ class VitCDANModule(LightningModule):
         optimizer: torch.optim.Optimizer,
         num_classes: int,
         scheduler: torch.optim.lr_scheduler = None,
+        fine_tuning_checkpoint: str = None,
     ):
         super().__init__()
 
@@ -39,6 +41,16 @@ class VitCDANModule(LightningModule):
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False)
 
+        # NOTE: Loading checkpoints created from another Lightning module fails because checkpoint
+        #       don't include weights for added models or parameters in this module (domain discriminator for example).
+        #       So we just load the checkpoint manually and extract the vit weights to apply them to the model afterwards.
+        if fine_tuning_checkpoint:
+            vit_weights = torch.load(fine_tuning_checkpoint)["state_dict"]
+            vit_weights_rn = OrderedDict()
+            for layername in vit_weights.keys():
+                # Checkpoint layers are names with prepended "net.", which differs from vit layer names we get from "from_pretrained"
+                if layername[:4] == "net.":
+                    vit_weights_rn[layername[4:]] = vit_weights[layername]
         self.net = AutoModelForImageClassification.from_pretrained(
             model_name,
             num_labels=num_classes,
@@ -46,13 +58,11 @@ class VitCDANModule(LightningModule):
             output_hidden_states=True,
             output_attentions=True,
         )
-        self.class_head = self.net.classifier
-        # self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
+
+        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
 
         # loss function
-        self.criterion_ddisc = ConditionalDomainAdversarialLoss(
-            DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False), reduction="mean"
-        )
+        self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
         self.criterion_classifier = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
@@ -79,7 +89,6 @@ class VitCDANModule(LightningModule):
         self.val_acc_best.reset()
 
     def model_step(self, batch_src: Any):
-        # TODO: python src/train.py -m 'experiment=STL-visda2017/vitb16_cdan' data.batch_size=8 trainer.max_epochs=5
         x, y = batch_src
 
         output_classifier = self.forward(x)
