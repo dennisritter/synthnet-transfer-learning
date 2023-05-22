@@ -60,7 +60,7 @@ class SwinV2CDANModule(LightningModule):
                     weights_rn[layername[4:]] = weights[layername]
             self.net.load_state_dict(weights_rn)
 
-        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
+        self.ddisc = DomainDiscriminator(in_feature=1024 * num_classes, hidden_size=1024, sigmoid=False)
 
         # loss function
         self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
