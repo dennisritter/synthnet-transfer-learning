@@ -45,12 +45,12 @@ class VitCDANModule(LightningModule):
         #       don't include weights for added models or parameters in this module (domain discriminator for example).
         #       So we just load the checkpoint manually and extract the vit weights to apply them to the model afterwards.
         if fine_tuning_checkpoint:
-            vit_weights = torch.load(fine_tuning_checkpoint)["state_dict"]
-            vit_weights_rn = OrderedDict()
-            for layername in vit_weights.keys():
+            weights = torch.load(fine_tuning_checkpoint)["state_dict"]
+            weights_rn = OrderedDict()
+            for layername in weights.keys():
                 # Checkpoint layers are names with prepended "net.", which differs from vit layer names we get from "from_pretrained"
                 if layername[:4] == "net.":
-                    vit_weights_rn[layername[4:]] = vit_weights[layername]
+                    weights_rn[layername[4:]] = weights[layername]
         self.net = AutoModelForImageClassification.from_pretrained(
             model_name,
             num_labels=num_classes,
@@ -58,7 +58,7 @@ class VitCDANModule(LightningModule):
             output_hidden_states=True,
             output_attentions=True,
         )
-        self.net.load_state_dict(vit_weights_rn)
+        self.net.load_state_dict(weights_rn)
 
         self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
 
