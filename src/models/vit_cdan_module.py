@@ -13,7 +13,7 @@ from tllib.modules.domain_discriminator import DomainDiscriminator
 
 
 class VitCDANModule(LightningModule):
-    """Lightningmodule for Vit based CDAN domain adaptation.
+    """Example of LightningModule for CDAN Domain Adaptation Vision Transformer Image classification.
 
     A LightningModule organizes your PyTorch code into 6 sections:
         - Computations (init)
@@ -34,6 +34,8 @@ class VitCDANModule(LightningModule):
         num_classes: int,
         scheduler: torch.optim.lr_scheduler = None,
         fine_tuning_checkpoint: str = None,
+        cdan_ddisc_in_feature: int = 768,
+        cdan_ddisc_hidden_size: int = 1024,
     ):
         super().__init__()
 
@@ -45,6 +47,7 @@ class VitCDANModule(LightningModule):
         #       don't include weights for added models or parameters in this module (domain discriminator for example).
         #       So we just load the checkpoint manually and extract the vit weights to apply them to the model afterwards.
         self.net = AutoModelForImageClassification.from_pretrained(
+            model_name,
             num_labels=num_classes,
             ignore_mismatched_sizes=True,
             output_hidden_states=True,
@@ -60,7 +63,11 @@ class VitCDANModule(LightningModule):
             self.net.load_state_dict(weights_rn)
             model_name,
 
-        self.ddisc = DomainDiscriminator(in_feature=768 * num_classes, hidden_size=1024, sigmoid=False)
+        self.ddisc = DomainDiscriminator(
+            in_feature=cdan_ddisc_in_feature * num_classes,
+            hidden_size=cdan_ddisc_hidden_size,
+            sigmoid=False,
+        )
 
         # loss function
         self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
