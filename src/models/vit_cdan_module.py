@@ -36,6 +36,7 @@ class VitCDANModule(LightningModule):
         fine_tuning_checkpoint: str = None,
         cdan_ddisc_in_feature: int = 768,
         cdan_ddisc_hidden_size: int = 1024,
+        cdan_ddisc_entropy_conditioning: bool = False,
     ):
         super().__init__()
 
@@ -70,7 +71,11 @@ class VitCDANModule(LightningModule):
         )
 
         # loss function
-        self.criterion_ddisc = ConditionalDomainAdversarialLoss(self.ddisc, reduction="mean")
+        self.criterion_ddisc = ConditionalDomainAdversarialLoss(
+            self.ddisc,
+            entropy_conditioning=cdan_ddisc_entropy_conditioning,
+            reduction="mean",
+        )
         self.criterion_classifier = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
