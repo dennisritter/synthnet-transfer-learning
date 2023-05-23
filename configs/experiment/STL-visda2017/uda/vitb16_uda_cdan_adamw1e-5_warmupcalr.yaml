@@ -41,7 +41,7 @@ model:
     # last_epoch: -1
   cdan_ddisc_in_feature: 768
   cdan_ddisc_hidden_size: 1024
-  cdan_ddisc_entropy_conditioning: true
+  cdan_ddisc_entropy_conditioning: false
 
 logger:
   wandb:

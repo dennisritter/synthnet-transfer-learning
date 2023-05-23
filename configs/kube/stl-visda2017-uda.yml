@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-visda2017-vit-uda-cdan-e
+  name: stl-visda2017-vit-uda-cdan-e-noaugmix
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-visda2017-vit-uda-cdan-e
+    - name: stl-visda2017-vit-uda-cdan-e-noaugmix
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
@@ -44,9 +44,9 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/train.py -m 'experiment=
-          STL-visda2017/uda/vitb16_uda_cdan-e_adamw1e-5_warmupcalr,
-          STL-visda2017/uda/vitb16_ch-uda_cdan-e_adamw1e-5_warmupcalr,
-          STL-visda2017/uda/vitb16_fft-uda_cdan-e_adamw1e-5_warmupcalr'
+          STL-visda2017/uda/vitb16_uda_cdan_adamw1e-5_warmupcalr,
+          STL-visda2017/uda/vitb16_ch-uda_cdan_adamw1e-5_warmupcalr,
+          STL-visda2017/uda/vitb16_fft-uda_cdan_adamw1e-5_warmupcalr'
       resources:
         limits:
           nvidia.com/gpu: 1
