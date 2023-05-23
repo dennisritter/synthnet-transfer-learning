@@ -1,0 +1,20 @@
+# @package _global_
+
+defaults:
+  - override /data: generic_visda2017.yaml
+  - override /model: vit.yaml
+  - override /trainer: default.yaml
+
+seed: 42
+
+model:
+  model_name: "google/vit-base-patch16-224-in21k"
+
+logger:
+  wandb:
+    id: c4v21fyt
+    project: STL-VisDa2017-Eval
+    name: ${hydra:runtime.choices.experiment}
+    tags: ${tags}
+
+ckpt_path: out/vitb16_ft_adamw1e-5_warmupcalr/epoch_007.ckpt
