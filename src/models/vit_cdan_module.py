@@ -1,15 +1,18 @@
 from collections import OrderedDict
 from typing import Any, List
 
-import numpy
+import numpy as np
 import torch
+import wandb
 from pytorch_lightning import LightningModule
+from sklearn.metrics import confusion_matrix
 from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
 from tllib.alignment.cdan import ConditionalDomainAdversarialLoss
 from tllib.modules.domain_discriminator import DomainDiscriminator
+from tllib.self_training.mcc import MinimumClassConfusionLoss
 
 
 class VitCDANModule(LightningModule):
@@ -37,13 +40,15 @@ class VitCDANModule(LightningModule):
         cdan_ddisc_in_feature: int = 768,
         cdan_ddisc_hidden_size: int = 1024,
         cdan_ddisc_entropy_conditioning: bool = False,
+        mcc: bool = False,
+        mcc_temperature: float = 1.0,
     ):
         super().__init__()
 
         # this line allows to access init params with 'self.hparams' attribute
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False)
-
+        self.mcc = mcc
         # NOTE: Loading checkpoints created from another Lightning module fails because checkpoint
         #       don't include weights for added models or parameters in this module (domain discriminator for example).
         #       So we just load the checkpoint manually and extract the vit weights to apply them to the model afterwards.
@@ -93,6 +98,10 @@ class VitCDANModule(LightningModule):
         # for tracking best so far validation accuracy
         self.val_acc_best = MaxMetric()
 
+        if mcc:
+            self.criterion_mcc = MinimumClassConfusionLoss(temperature=mcc_temperature)
+            self.train_loss_mcc = MeanMetric()
+
     def forward(self, x: torch.Tensor):
         return self.net(x)
 
@@ -123,11 +132,18 @@ class VitCDANModule(LightningModule):
         target_net_output = self.forward(x_target)
         target_logits, target_features = target_net_output["logits"], target_net_output["hidden_states"][-1][:, 0, :]
         loss_ddisc = self.criterion_ddisc(src_logits, src_features, target_logits, target_features)
+        loss = loss_classifier + loss_ddisc
+
+        if self.mcc:
+            loss_mcc = self.criterion_mcc(target_logits)
+            loss += loss_mcc
+            self.train_loss_mcc(loss_mcc)
+            self.log("train/loss_mcc", self.train_loss_mcc, on_step=False, on_epoch=True, prog_bar=True)
 
         # update and log metrics
         self.train_loss_classifier(loss_classifier)
         self.train_loss_ddisc(loss_ddisc)
-        self.train_loss(loss_classifier + loss_ddisc)
+        self.train_loss(loss)
         self.train_acc(src_preds, src_targets)
         self.log("train/loss_classifier", self.train_loss_classifier, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/loss_ddisc", self.train_loss_ddisc, on_step=False, on_epoch=True, prog_bar=True)
@@ -138,7 +154,7 @@ class VitCDANModule(LightningModule):
         # and then read it in some callback or in `training_epoch_end()` below
         # remember to always return loss from `training_step()` or backpropagation will fail!
         return {
-            "loss": loss_classifier,
+            "loss": loss,
             "preds": src_preds,
             "targets": src_targets,
         }
@@ -173,6 +189,10 @@ class VitCDANModule(LightningModule):
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True)
 
+    def on_test_epoch_start(self):
+        self.preds_test_all = None
+        self.targets_test_all = None
+
     def test_step(self, batch: Any, batch_idx: int):
         loss, preds, logits, features, targets = self.model_step(batch)
 
@@ -182,10 +202,48 @@ class VitCDANModule(LightningModule):
         self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("test/acc", self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
 
+        self.preds_test_all = (
+            torch.cat((self.preds_test_all, preds), 0) if torch.is_tensor(self.preds_test_all) else preds
+        )
+        self.targets_test_all = (
+            torch.cat((self.targets_test_all, targets), 0) if torch.is_tensor(self.targets_test_all) else targets
+        )
+
         return {"loss": loss, "preds": preds, "targets": targets}
 
     def on_test_epoch_end(self):
-        pass
+        class_names = list(self.trainer.datamodule.label2idx.keys())
+        cm = confusion_matrix(
+            y_true=self.targets_test_all.cpu(),
+            y_pred=self.preds_test_all.cpu(),
+            normalize="true",
+        )
+        class_acc = cm.diagonal()
+        data = [[name, acc] for (name, acc) in zip(class_names, class_acc)]
+        table = wandb.Table(data=data, columns=["class_name", "acc"])
+
+        # Accuracy Per class Barchart
+        self.logger.experiment.log(
+            {
+                "test/acc_per_class": wandb.plot.bar(
+                    table,
+                    "class_name",
+                    "acc",
+                    title="Per Class Accuracy",
+                )
+            }
+        )
+        # Confusion Matrix (normalized on trues)
+        self.logger.experiment.log(
+            {
+                "test/confmat": wandb.sklearn.plot_confusion_matrix(
+                    y_true=self.targets_test_all.cpu(),
+                    y_pred=self.preds_test_all.cpu(),
+                    labels=class_names,
+                    normalize="true",
+                )
+            }
+        )
 
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization. Normally you'd need one. But

@@ -14,7 +14,7 @@ tags:
     "visda2017",
     "vitb16",
     "Domain Adaptation",
-    "CDAN",
+    "CDAN-MCC",
     "CosineAnnealingLR",
     "augmix",
   ]
@@ -25,9 +25,13 @@ trainer:
   min_epochs: 1
   max_epochs: 20
 
+# ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_ch_sgd1e-3/2023-04-21_14-13-45/2/checkpoints/epoch_000.ckpt
 model:
+  # Load model from checkpoint (weights only)
+  # _target_: models.vit_cdan_module.VitCDANModule.load_from_checkpoint
+  # checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_ch_sgd1e-3/2023-04-21_14-13-45/2/checkpoints/epoch_000.ckpt
   model_name: "google/vit-base-patch16-224-in21k"
-  fine_tuning_checkpoint: "out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_che0-ft_augmix/2023-04-25_20-48-52/0/checkpoints/epoch_008.ckpt"
+  fine_tuning_checkpoint: "out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_ch_sgd1e-3/2023-04-21_14-13-45/2/checkpoints/epoch_000.ckpt"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
@@ -42,7 +46,7 @@ model:
     # last_epoch: -1
   cdan_ddisc_in_feature: 768
   cdan_ddisc_hidden_size: 1024
-  cdan_ddisc_entropy_conditioning: false
+  mcc: true
 
 logger:
   wandb:
@@ -56,6 +60,6 @@ data:
   image_size_w: 224
   random_horizontal_flip: true
   random_vertical_flip: false
-  random_color_jitter: true
-  random_grayscale: true
-  augmix: false
+  random_color_jitter: false
+  random_grayscale: false
+  augmix: true

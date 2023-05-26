@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: adaptation_visda2017.yaml
-  - override /model: vit_cdan.yaml
+  - override /model: vit_mcc.yaml
   - override /callbacks: default_ada.yaml
   - override /trainer: default.yaml
 
@@ -12,9 +12,9 @@ defaults:
 tags:
   [
     "visda2017",
-    "vitb16",
+    "swinv2",
     "Domain Adaptation",
-    "CDAN",
+    "MCC",
     "CosineAnnealingLR",
     "augmix",
   ]
@@ -26,8 +26,8 @@ trainer:
   max_epochs: 20
 
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
-  fine_tuning_checkpoint: "out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_che0-ft_augmix/2023-04-25_20-48-52/0/checkpoints/epoch_008.ckpt"
+  model_name: microsoft/swinv2-base-patch4-window12-192-22k
+  fine_tuning_checkpoint: "out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/swinv2_ch_sgd1e-3/2023-04-21_14-13-45/5/checkpoints/epoch_000.ckpt"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
@@ -40,8 +40,6 @@ model:
     num_training_steps: ${trainer.max_epochs}
     # num_cycles: 0.5
     # last_epoch: -1
-  cdan_ddisc_in_feature: 768
-  cdan_ddisc_hidden_size: 1024
 
 logger:
   wandb:
@@ -51,8 +49,8 @@ logger:
     tags: ${tags}
 
 data:
-  image_size_h: 224
-  image_size_w: 224
+  image_size_h: 192
+  image_size_w: 192
   random_horizontal_flip: true
   random_vertical_flip: false
   random_color_jitter: false
