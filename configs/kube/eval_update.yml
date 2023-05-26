@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-eval-3
+  name: stl-eval1
 spec:
   restartPolicy: Never
   containers:
