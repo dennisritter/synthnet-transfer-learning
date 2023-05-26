@@ -44,9 +44,7 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/eval.py -m 'experiment=
-          STL-visda2017/uda/_eval_generic1,
-          STL-visda2017/uda/_eval_generic2,
-          STL-visda2017/uda/_eval_generic3'
+          STL-visda2017/uda/_eval_generic'
       resources:
         limits:
           nvidia.com/gpu: 1
