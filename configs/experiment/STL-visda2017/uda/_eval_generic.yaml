@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: adaptation_visda2017.yaml
-  - override /model: swinv2_mcc.yaml
+  - override /model: vit_mcc.yaml
   - override /trainer: default.yaml
 
 seed: 42
