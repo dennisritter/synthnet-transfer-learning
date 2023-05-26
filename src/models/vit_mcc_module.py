@@ -218,22 +218,22 @@ class VitMCCModule(LightningModule):
                 )
             }
         )
-        # TSNE // Embedding projector
-        tsne_cols = np.arange(self.cls_tokens_all.size(dim=1)).astype(str).tolist()
-        tsne_cols.insert(0, "target")
+        # # TSNE // Embedding projector
+        # tsne_cols = np.arange(self.cls_tokens_all.size(dim=1)).astype(str).tolist()
+        # tsne_cols.insert(0, "target")
 
-        tsne_embeddings = self.cls_tokens_all.cpu().tolist()
-        tsne_targets = [self.trainer.datamodule.idx2label[cls_idx] for cls_idx in self.targets_test_all.cpu().tolist()]
-        tsne_data = [[target] + tsne_embeddings[i] for i, target in enumerate(tsne_targets)]
+        # tsne_embeddings = self.cls_tokens_all.cpu().tolist()
+        # tsne_targets = [self.trainer.datamodule.idx2label[cls_idx] for cls_idx in self.targets_test_all.cpu().tolist()]
+        # tsne_data = [[target] + tsne_embeddings[i] for i, target in enumerate(tsne_targets)]
 
-        self.logger.experiment.log(
-            {
-                "embeddings": wandb.Table(
-                    columns=tsne_cols,
-                    data=tsne_data,
-                )
-            }
-        )
+        # self.logger.experiment.log(
+        #     {
+        #         "embeddings": wandb.Table(
+        #             columns=tsne_cols,
+        #             data=tsne_data,
+        #         )
+        #     }
+        # )
 
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization. Normally you'd need one. But
