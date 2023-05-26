@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Any, List
 
 import numpy as np
@@ -9,9 +10,11 @@ from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
+from tllib.self_training.mcc import MinimumClassConfusionLoss
 
-class VitModule(LightningModule):
-    """Example of LightningModule for Vision Transformer Image classification.
+
+class VitMCCModule(LightningModule):
+    """Example of LightningModule for CDAN Domain Adaptation Vision Transformer Image classification.
 
     A LightningModule organizes your PyTorch code into 6 sections:
         - Computations (init)
@@ -31,22 +34,38 @@ class VitModule(LightningModule):
         optimizer: torch.optim.Optimizer,
         num_classes: int,
         scheduler: torch.optim.lr_scheduler = None,
+        fine_tuning_checkpoint: str = None,
+        mcc_temperature: float = 1.0,
     ):
         super().__init__()
 
         # this line allows to access init params with 'self.hparams' attribute
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False)
-        self.num_classes = num_classes
 
+        # NOTE: Loading checkpoints created from another Lightning module fails because checkpoint
+        #       don't include weights for added models or parameters in this module (domain discriminator for example).
+        #       So we just load the checkpoint manually and extract the vit weights to apply them to the model afterwards.
         self.net = AutoModelForImageClassification.from_pretrained(
             model_name,
             num_labels=num_classes,
             ignore_mismatched_sizes=True,
+            output_hidden_states=True,
+            output_attentions=True,
         )
-        self.class_head = self.net.classifier
+        if fine_tuning_checkpoint:
+            weights = torch.load(fine_tuning_checkpoint)["state_dict"]
+            weights_rn = OrderedDict()
+            for layername in weights.keys():
+                # Checkpoint layers are names with prepended "net.", which differs from vit layer names we get from "from_pretrained"
+                if layername[:4] == "net.":
+                    weights_rn[layername[4:]] = weights[layername]
+            self.net.load_state_dict(weights_rn)
+            model_name,
+
         # loss function
-        self.criterion = torch.nn.CrossEntropyLoss()
+        self.criterion_mcc = MinimumClassConfusionLoss(temperature=mcc_temperature)
+        self.criterion_classifier = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
@@ -54,6 +73,8 @@ class VitModule(LightningModule):
         self.test_acc = Accuracy(task="multiclass", num_classes=num_classes)
 
         # for averaging loss across batches
+        self.train_loss_classifier = MeanMetric()
+        self.train_loss_mcc = MeanMetric()
         self.train_loss = MeanMetric()
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
@@ -69,30 +90,48 @@ class VitModule(LightningModule):
         # so we need to make sure val_acc_best doesn't store accuracy from these checks
         self.val_acc_best.reset()
 
-    def model_step(self, batch: Any):
-        x, y = batch
-        # print(x)
-        # if torch.isnan(x).any() or torch.isinf(x).any():
-        #     print('invalid input detected at iteration')
-        logits = self.forward(x)["logits"]
-        loss = self.criterion(logits, y)
-        # print(f"loss = {loss}")
-        preds = torch.argmax(logits, dim=1)
-        return loss, preds, y
+    def model_step(self, batch_src: Any):
+        x, y = batch_src
+
+        output_classifier = self.forward(x)
+        logits_classifier = output_classifier["logits"]
+        features_classifier = output_classifier["hidden_states"][-1][:, 0, :]
+        loss_classifier = self.criterion_classifier(logits_classifier, y)
+        preds_classifier = torch.argmax(logits_classifier, dim=1)
+
+        return loss_classifier, preds_classifier, logits_classifier, features_classifier, y
 
     def training_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        # NOTE: We expect a batch from MultiDataParallelLoader, which is a custom dataloader that
+        #       collates data from multiple datasets in parallel
+        #       In our use case this represents SOURCE and TARGET domain data for domain adaptation.
+
+        batch_src, batch_target = batch
+        loss_classifier, src_preds, src_logits, src_features, src_y = self.model_step(batch_src)
+        x_target, y_target = batch_target
+        target_net_output = self.forward(x_target)
+        target_logits, target_features = target_net_output["logits"], target_net_output["hidden_states"][-1][:, 0, :]
+        loss_mcc = self.criterion_mcc(target_logits)
+        loss = loss_classifier + loss_mcc
 
         # update and log metrics
-        self.train_loss(loss)
-        self.train_acc(preds, targets)
+        self.train_loss_classifier(loss_classifier)
+        self.train_loss_mcc(loss_mcc)
+        self.train_loss(loss_classifier + loss_mcc)
+        self.train_acc(src_preds, src_y)
+        self.log("train/loss_classifier", self.train_loss_classifier, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/loss_mcc", self.train_loss_mcc, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
 
         # we can return here dict with any tensors
         # and then read it in some callback or in `training_epoch_end()` below
         # remember to always return loss from `training_step()` or backpropagation will fail!
-        return {"loss": loss, "preds": preds, "targets": targets}
+        return {
+            "loss": loss,
+            "preds": src_preds,
+            "targets": src_y,
+        }
 
     def on_training_epoch_end(self):
         # `outputs` is a list of dicts returned from `training_step()`
@@ -107,7 +146,7 @@ class VitModule(LightningModule):
         pass
 
     def validation_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.val_loss(loss)
@@ -129,7 +168,7 @@ class VitModule(LightningModule):
         self.targets_test_all = None
 
     def test_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.test_loss(loss)
@@ -147,7 +186,6 @@ class VitModule(LightningModule):
         return {"loss": loss, "preds": preds, "targets": targets}
 
     def on_test_epoch_end(self):
-        # Log confusion matrix top1 class accuracies
         class_names = list(self.trainer.datamodule.label2idx.keys())
         cm = confusion_matrix(
             y_true=self.targets_test_all.cpu(),
@@ -208,4 +246,4 @@ class VitModule(LightningModule):
 
 
 if __name__ == "__main__":
-    _ = VitModule(None, None, None, None)
+    _ = VitMCCModule(None, None, None, None)
