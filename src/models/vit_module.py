@@ -43,10 +43,12 @@ class VitModule(LightningModule):
             model_name,
             num_labels=num_classes,
             ignore_mismatched_sizes=True,
+            output_hidden_states=True,
+            output_attentions=True,
         )
         self.class_head = self.net.classifier
         # loss function
-        self.criterion = torch.nn.CrossEntropyLoss()
+        self.criterion_classifier = torch.nn.CrossEntropyLoss()
 
         # metric objects for calculating and averaging accuracy across batches
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
@@ -69,19 +71,19 @@ class VitModule(LightningModule):
         # so we need to make sure val_acc_best doesn't store accuracy from these checks
         self.val_acc_best.reset()
 
-    def model_step(self, batch: Any):
-        x, y = batch
-        # print(x)
-        # if torch.isnan(x).any() or torch.isinf(x).any():
-        #     print('invalid input detected at iteration')
-        logits = self.forward(x)["logits"]
-        loss = self.criterion(logits, y)
-        # print(f"loss = {loss}")
-        preds = torch.argmax(logits, dim=1)
-        return loss, preds, y
+    def model_step(self, batch_src: Any):
+        x, y = batch_src
+
+        output_classifier = self.forward(x)
+        logits_classifier = output_classifier["logits"]
+        features_classifier = output_classifier["hidden_states"][-1][:, 0, :]
+        loss_classifier = self.criterion_classifier(logits_classifier, y)
+        preds_classifier = torch.argmax(logits_classifier, dim=1)
+
+        return loss_classifier, preds_classifier, logits_classifier, features_classifier, y
 
     def training_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.train_loss(loss)
@@ -107,7 +109,7 @@ class VitModule(LightningModule):
         pass
 
     def validation_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.val_loss(loss)
@@ -127,9 +129,10 @@ class VitModule(LightningModule):
     def on_test_epoch_start(self):
         self.preds_test_all = None
         self.targets_test_all = None
+        self.cls_tokens_all = None
 
     def test_step(self, batch: Any, batch_idx: int):
-        loss, preds, targets = self.model_step(batch)
+        loss, preds, logits, features, targets = self.model_step(batch)
 
         # update and log metrics
         self.test_loss(loss)
@@ -142,6 +145,9 @@ class VitModule(LightningModule):
         )
         self.targets_test_all = (
             torch.cat((self.targets_test_all, targets), 0) if torch.is_tensor(self.targets_test_all) else targets
+        )
+        self.cls_tokens_all = (
+            torch.cat((self.cls_tokens_all, features), 0) if torch.is_tensor(self.cls_tokens_all) else features
         )
 
         return {"loss": loss, "preds": preds, "targets": targets}
@@ -177,6 +183,22 @@ class VitModule(LightningModule):
                     y_pred=self.preds_test_all.cpu(),
                     labels=class_names,
                     normalize="true",
+                )
+            }
+        )
+        # TSNE // Embedding projector
+        tsne_cols = np.arange(self.cls_tokens_all.size(dim=1)).astype(str).tolist()
+        tsne_cols.insert(0, "target")
+
+        tsne_embeddings = self.cls_tokens_all.cpu().tolist()
+        tsne_targets = [self.trainer.datamodule.idx2label[cls_idx] for cls_idx in self.targets_test_all.cpu().tolist()]
+        tsne_data = [[target] + tsne_embeddings[i] for i, target in enumerate(tsne_targets)]
+
+        self.logger.experiment.log(
+            {
+                "embeddings": wandb.Table(
+                    columns=tsne_cols,
+                    data=tsne_data,
                 )
             }
         )

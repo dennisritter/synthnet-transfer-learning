@@ -93,7 +93,7 @@ class GenericAdaptationDM(pl.LightningDataModule):
         self.train_src = [ImageFolder(train_src_dir) for train_src_dir in self.train_src_dirs]
         self.train_target = [ImageFolder(train_target_dir) for train_target_dir in self.train_target_dirs]
         self.val = [ImageFolder(val_dir) for val_dir in self.val_dirs]
-        self.test = [ImageFolder(test_dir) for test_dir in self.val_dirs]
+        self.test = [ImageFolder(test_dir) for test_dir in self.test_dirs]
 
         for train_src_ds in self.train_src:
             train_src_ds.transform = self.train_transform

@@ -12,9 +12,10 @@ model:
 
 logger:
   wandb:
-    id: c4v21fyt
+    # id: c4v21fyt
     project: STL-VisDa2017-Eval
-    name: ${hydra:runtime.choices.experiment}
+    # name: ${hydra:runtime.choices.experiment}
+    name: vitb16_ch_sgd1e-3_e0
     tags: ${tags}
 
-ckpt_path: out/vitb16_ft_adamw1e-5_warmupcalr/epoch_007.ckpt
+ckpt_path: out/checkpoints/visda2017/vitb16_ch_sgd1e-3_e0.ckpt

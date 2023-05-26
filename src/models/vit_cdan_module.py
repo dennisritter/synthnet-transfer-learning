@@ -192,6 +192,7 @@ class VitCDANModule(LightningModule):
     def on_test_epoch_start(self):
         self.preds_test_all = None
         self.targets_test_all = None
+        self.cls_tokens_all = None
 
     def test_step(self, batch: Any, batch_idx: int):
         loss, preds, logits, features, targets = self.model_step(batch)
@@ -207,6 +208,9 @@ class VitCDANModule(LightningModule):
         )
         self.targets_test_all = (
             torch.cat((self.targets_test_all, targets), 0) if torch.is_tensor(self.targets_test_all) else targets
+        )
+        self.cls_tokens_all = (
+            torch.cat((self.cls_tokens_all, features), 0) if torch.is_tensor(self.cls_tokens_all) else features
         )
 
         return {"loss": loss, "preds": preds, "targets": targets}
@@ -241,6 +245,22 @@ class VitCDANModule(LightningModule):
                     y_pred=self.preds_test_all.cpu(),
                     labels=class_names,
                     normalize="true",
+                )
+            }
+        )
+        # TSNE // Embedding projector
+        tsne_cols = np.arange(self.cls_tokens_all.size(dim=1)).astype(str).tolist()
+        tsne_cols.insert(0, "target")
+
+        tsne_embeddings = self.cls_tokens_all.cpu().tolist()
+        tsne_targets = [self.trainer.datamodule.idx2label[cls_idx] for cls_idx in self.targets_test_all.cpu().tolist()]
+        tsne_data = [[target] + tsne_embeddings[i] for i, target in enumerate(tsne_targets)]
+
+        self.logger.experiment.log(
+            {
+                "embeddings": wandb.Table(
+                    columns=tsne_cols,
+                    data=tsne_data,
                 )
             }
         )
