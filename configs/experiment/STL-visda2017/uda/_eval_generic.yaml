@@ -12,9 +12,9 @@ model:
 
 logger:
   wandb:
-    id: 7knzndau
+    id: v5dk3z2k
     project: STL-visda2017
     # name: ${hydra:runtime.choices.experiment}
-    name: STL-visda2017/uda/swinv2_uda_cdan_adamw1e-5_warmupcalr_augmix
+    name: STL-visda2017/uda/swinv2_uda_cdan-mcc_adamw1e-5_warmupcalr_augmix
     # tags: ${tags}
-ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/swinv2_uda_cdan_adamw1e-5_warmupcalr_augmix/2023-05-26_10-31-50/0/checkpoints/epoch_001.ckpt
+ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/swinv2_uda_cdan-mcc_adamw1e-5_warmupcalr_augmix/2023-05-26_10-31-23/0/checkpoints/epoch_001.ckpt
