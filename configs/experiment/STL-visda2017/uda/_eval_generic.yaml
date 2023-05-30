@@ -2,21 +2,19 @@
 
 defaults:
   - override /data: adaptation_visda2017.yaml
-  - override /model: vit_cdan.yaml
+  - override /model: vit_mcc.yaml
   - override /trainer: default.yaml
 
 seed: 42
 
 model:
   model_name: microsoft/swinv2-base-patch4-window12-192-22k
-  cdan_ddisc_in_feature: 1024
-  cdan_ddisc_hidden_size: 1024
 
 logger:
   wandb:
-    id: 7knzndau
+    id: 56tx06aq
     project: STL-visda2017
     # name: ${hydra:runtime.choices.experiment}
-    name: STL-visda2017/uda/swinv2_uda_cdan_adamw1e-5_warmupcalr_augmix
+    name: STL-visda2017/uda/swinv2_ch-uda_mcc_adamw1e-5_warmupcalr_augmix
     # tags: ${tags}
-ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/swinv2_uda_cdan_adamw1e-5_warmupcalr_augmix/2023-05-26_10-31-50/0/checkpoints/epoch_001.ckpt
+ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/swinv2_ch-uda_mcc_adamw1e-5_warmupcalr_augmix/2023-05-26_10-31-10/1/checkpoints/epoch_001.ckpt
