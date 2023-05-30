@@ -2,7 +2,7 @@
 
 defaults:
   - override /data: adaptation_visda2017.yaml
-  - override /model: vit_mcc.yaml
+  - override /model: vit_cdan.yaml
   - override /trainer: default.yaml
 
 seed: 42
@@ -12,9 +12,9 @@ model:
 
 logger:
   wandb:
-    id: oc9wg22t
+    id: yljv2j9j
     project: STL-visda2017
     # name: ${hydra:runtime.choices.experiment}
-    name: STL-visda2017/uda/vitb16_ch-uda_mcc_adamw1e-5_warmupcalr_augmix
+    name: STL-visda2017/uda/vitb16_ch-uda_cdan_adamw1e-5_warmupcalr_augmix
     # tags: ${tags}
-ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/vitb16_ch-uda_mcc_adamw1e-5_warmupcalr_augmix/2023-05-26_10-30-43/1/checkpoints/epoch_002.ckpt
+ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/vitb16_ch-uda_cdan_adamw1e-5_warmupcalr_augmix/2023-05-26_10-31-23/1/checkpoints/epoch_007.ckpt
