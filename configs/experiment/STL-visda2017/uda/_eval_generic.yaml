@@ -8,13 +8,13 @@ defaults:
 seed: 42
 
 model:
-  model_name: microsoft/swinv2-base-patch4-window12-192-22k
+  # model_name: microsoft/swinv2-base-patch4-window12-192-22k
 
 logger:
   wandb:
-    id: 56tx06aq
+    id: oc9wg22t
     project: STL-visda2017
     # name: ${hydra:runtime.choices.experiment}
-    name: STL-visda2017/uda/swinv2_ch-uda_mcc_adamw1e-5_warmupcalr_augmix
+    name: STL-visda2017/uda/vitb16_ch-uda_mcc_adamw1e-5_warmupcalr_augmix
     # tags: ${tags}
-ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/swinv2_ch-uda_mcc_adamw1e-5_warmupcalr_augmix/2023-05-26_10-31-10/1/checkpoints/epoch_001.ckpt
+ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/uda/vitb16_ch-uda_mcc_adamw1e-5_warmupcalr_augmix/2023-05-26_10-30-43/1/checkpoints/epoch_002.ckpt
