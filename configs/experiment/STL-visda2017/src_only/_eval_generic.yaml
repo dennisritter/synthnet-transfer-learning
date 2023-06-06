@@ -8,14 +8,14 @@ defaults:
 seed: 42
 
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
+  model_name: microsoft/swinv2-base-patch4-window12-192-22k
 
 logger:
   wandb:
-    id: gyi9o7z0
+    id: gcuksipk
     project: STL-visda2017
     # name: ${hydra:runtime.choices.experiment}
-    name: STL-visda2017/vitb16_che0-ft_augmix
+    name: STL-visda2017/swinv2_ch_sgd1e-3
     # tags: ${tags}
 
-ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_che0-ft_augmix/2023-04-25_20-48-52/0/checkpoints/epoch_008.ckpt
+ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/swinv2_ch_sgd1e-3/2023-04-21_14-13-45/5/checkpoints/epoch_000.ckpt
