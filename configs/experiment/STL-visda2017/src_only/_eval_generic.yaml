@@ -19,3 +19,7 @@ logger:
     # tags: ${tags}
 
 ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/swinv2_ch_sgd1e-3/2023-04-21_14-13-45/5/checkpoints/epoch_000.ckpt
+
+data:
+  image_size_h: 192
+  image_size_w: 192
