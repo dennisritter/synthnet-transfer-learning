@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-eval-v5dk3z2k-fix
+  name: stl-eval-gyi9o7z0-fix
 spec:
   restartPolicy: Never
   containers:
@@ -44,7 +44,7 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/eval.py -m 'experiment=
-          STL-visda2017/uda/_eval_generic'
+          STL-visda2017/src_only/_eval_generic'
       resources:
         limits:
           nvidia.com/gpu: 1

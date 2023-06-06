@@ -12,10 +12,10 @@ model:
 
 logger:
   wandb:
-    # id: c4v21fyt
-    project: STL-VisDa2017-Eval
+    id: gyi9o7z0
+    project: STL-visda2017
     # name: ${hydra:runtime.choices.experiment}
-    name: vitb16_ch_sgd1e-3_e0
-    tags: ${tags}
+    name: STL-visda2017/vitb16_che0-ft_augmix
+    # tags: ${tags}
 
-ckpt_path: out/checkpoints/visda2017/vitb16_ch_sgd1e-3_e0.ckpt
+ckpt_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-visda2017/vitb16_che0-ft_augmix/2023-04-25_20-48-52/0/checkpoints/epoch_008.ckpt
