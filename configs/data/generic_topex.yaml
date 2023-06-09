@@ -1,6 +1,6 @@
 _target_: datamodules.generic_finetune_dm.GenericFinetuneDM
 train_dir: ${paths.data_dir}topex-printer/train
-val_dir: ${paths.data_dir}topex-printer/val
+val_dir: ${paths.data_dir}topex-printer/test
 test_dir: ${paths.data_dir}topex-printer/test
 batch_size: 32
 num_workers: 4
