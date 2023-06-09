@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-topex-uda-swinv2-lrs
+  name: stl-topex-uda-swinv2-cdan-mcc
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-topex-uda-swinv2-lrs
+    - name: stl-topex-uda-swinv2-cdan-mcc
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
