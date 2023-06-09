@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /data: adaptation_visda2017.yaml
+  - override /data: adaptation_topex.yaml
   - override /model: vit_cdan.yaml
   - override /callbacks: default_ada.yaml
   - override /trainer: default.yaml
@@ -11,7 +11,7 @@ defaults:
 
 tags:
   [
-    "visda2017",
+    "topex",
     "vitb16",
     "Domain Adaptation",
     "CDAN",
@@ -44,7 +44,7 @@ model:
 
 logger:
   wandb:
-    project: STL-visda2017
+    project: STL-topex
     job_type: "Domain Adaptation"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}
