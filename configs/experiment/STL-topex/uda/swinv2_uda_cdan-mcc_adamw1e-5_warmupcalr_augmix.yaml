@@ -27,7 +27,6 @@ trainer:
 
 model:
   model_name: microsoft/swinv2-base-patch4-window12-192-22k
-  fine_tuning_checkpoint: "out/synthnet-transfer-learning-outputs/train/multiruns/STL-topex/swinv2_ch_sgd1e-3/2023-04-21_14-13-45/5/checkpoints/epoch_000.ckpt"
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true

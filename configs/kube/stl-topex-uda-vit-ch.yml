@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-topex-vit
+  name: stl-topex-vit-ch
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-topex-vit
+    - name: stl-topex-vit-ch
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME

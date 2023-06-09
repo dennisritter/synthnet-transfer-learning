@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-topex-uda-swinv2-ch
+  name: stl-topex-uda-swinv2-lrs
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-topex-uda-swinv2-ch
+    - name: stl-topex-uda-swinv2-lrs
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
@@ -44,9 +44,10 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/train.py -m 'experiment=
-          STL-topex/uda/swinv2_uda_cdan_adamw1e-5_warmupcalr_augmix.yaml,
-          STL-topex/uda/swinv2_uda_cdan-mcc_adamw1e-5_warmupcalr_augmix.yaml,
-          STL-topex/uda/swinv2_uda_mcc_adamw1e-5_warmupcalr_augmix.yaml'
+          STL-topex/uda/swinv2_uda_cdan-mcc_adamw1e-4_warmupcalr_augmix.yaml,
+          STL-topex/uda/swinv2_uda_cdan-mcc_adamw1e-3_warmupcalr_augmix.yaml,
+          STL-topex/uda/swinv2_ch-uda_cdan-mcc_adamw1e-3_warmupcalr_augmix.yaml,
+          STL-topex/uda/swinv2_ch-uda_cdan-mcc_adamw1e-4_warmupcalr_augmix.yaml'
       resources:
         limits:
           nvidia.com/gpu: 1
