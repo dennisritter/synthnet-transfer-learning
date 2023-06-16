@@ -3,21 +3,25 @@ datasets
 evaluate
 
 numpy
+numba
 scikit-learn
 pytorch-lightning       # pytorch lightning
+torchvision
+opencv-python
 # --- config & logging ---
 wandb
 omegaconf
 hydra-core
 hydra-colorlog
 rich            # beautiful text formatting in terminal
+webcolors
+prettytable
 # --- other ---
 pyrootutils     # standardizing the project root setup
 pre-commit      # hooks for applying linters on commit
 black           # Python code formatter
 flake8          # python linter
 isort           # sort python imports
-pyrootutils     # solve problems with pythonpath, working directory, file paths, module imports and environment variables
 
 # --- personal/optional ---
 # jupyter_contrib_nbextensions
