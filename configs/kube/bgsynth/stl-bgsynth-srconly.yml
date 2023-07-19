@@ -39,7 +39,7 @@ spec:
       args:
         # - while true; do sleep 30; done;
         - cd /src-pv/synthnet-transfer-learning;
-          git checkout 35-moritz_ma_bgsynth_wood;
+          git checkout main;
           git pull;
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
