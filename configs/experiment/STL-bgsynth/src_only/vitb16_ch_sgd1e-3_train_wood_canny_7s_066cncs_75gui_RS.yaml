@@ -42,6 +42,6 @@ logger:
     tags: ${tags}
 
 data:
-  train_dir: ${paths.data_dir}bgsynth_wood/train
+  train_dir: ${paths.data_dir}moritz_ba/train_wood_canny_7s_066cncs_75gui_RS/train
   image_size_h: 224
   image_size_w: 224
