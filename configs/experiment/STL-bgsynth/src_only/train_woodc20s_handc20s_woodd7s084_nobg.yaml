@@ -12,7 +12,7 @@ defaults:
 tags:
   [
     "topex",
-    "vitb16",
+    "swinv2",
     "class head only",
     "SGD",
     "baseline augmentations",
@@ -26,7 +26,7 @@ trainer:
   max_epochs: 20
 
 model:
-  model_name: "google/vit-base-patch16-224-in21k"
+  model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
   optimizer:
     _target_: torch.optim.SGD
     lr: 0.001
@@ -42,6 +42,6 @@ logger:
     tags: ${tags}
 
 data:
-  train_dir: ${paths.data_dir}moritz_ba/train_wood_canny_7s_066cncs_75gui_RS/train
-  image_size_h: 224
-  image_size_w: 224
+  train_dir: ${paths.data_dir}moritz_ba/train_woodc20s_handc20s_woodd7s084_nobg/train
+  image_size_h: 192
+  image_size_w: 192
