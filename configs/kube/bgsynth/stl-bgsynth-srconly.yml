@@ -44,8 +44,8 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/train.py -m 'experiment=
-          train_wood_canny_4_20s,
-          train_woodc20s_handc20s_woodd7s084_nobg'
+          STL-bgsynth/src_only/train_wood_canny_4_20s,
+          STL-bgsynth/src_only/train_woodc20s_handc20s_woodd7s084_nobg'
       resources:
         limits:
           nvidia.com/gpu: 1
