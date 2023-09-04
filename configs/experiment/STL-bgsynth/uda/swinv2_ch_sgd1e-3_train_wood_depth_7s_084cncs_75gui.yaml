@@ -28,7 +28,7 @@ trainer:
 
 model:
   model_name: microsoft/swinv2-base-patch4-window12-192-22k
-  fine_tuning_checkpoint: out/synthnet-transfer-learning-outputs/train/multiruns/STL-bgsynth/src_only/swinv2_ch_sgd1e-3_wood.yaml/2023-07-19_21-26-06/0/checkpoints/epoch_018.ckpt
+  fine_tuning_checkpoint: out/synthnet-transfer-learning-outputs/train/multiruns/STL-bgsynth/src_only/swinv2_ch_sgd1e-3_train_wood_depth_7s_084cncs_75gui.yaml/2023-09-03_19-03-55/6/checkpoints/epoch_018.ckpt
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
@@ -53,6 +53,7 @@ logger:
     tags: ${tags}
 
 data:
+  train_src_dirs: [data/moritz_ba/train_wood_depth_7s_084cncs_75gui/train]
   image_size_h: 192
   image_size_w: 192
   random_horizontal_flip: true
