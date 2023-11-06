@@ -15,11 +15,11 @@ RUN apt update && \
     pip install wandb && \
     pip install omegaconf && \
     pip install hydra-core && \
-    pip install hydra-colorlog \
-    pip install rich \
-    pip install numba \
-    pip install prettytable \
-    pip install webcolors \
+    pip install hydra-colorlog && \
+    pip install rich && \
+    pip install numba && \
+    pip install prettytable && \
+    pip install webcolors && \
     pip install opencv-python
 
 RUN apt-get -y install git
