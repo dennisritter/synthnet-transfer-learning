@@ -4,6 +4,7 @@ defaults:
   - _self_
   - data: generic_visda2017.yaml # choose datamodule with `test_dataloader()` for evaluation
   - model: vit.yaml
+  - callbacks: default_eval.yaml
   - logger: wandb
   - trainer: default.yaml
   - paths: default.yaml

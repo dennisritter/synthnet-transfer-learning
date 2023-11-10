@@ -57,17 +57,13 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     # for predictions use trainer.predict(...)
     # predictions = trainer.predict(model=model, dataloaders=dataloaders, ckpt_path=cfg.ckpt_path)
 
-    metric_dict = trainer.callback_metrics
+    # metric_dict = trainer.callback_metrics
 
-    return metric_dict, object_dict
+    # return metric_dict, object_dict
 
 
-@hydra.main(version_base="1.3", config_path="../configs", config_name="eval.yaml")
+@hydra.main(version_base=None, config_path="../configs", config_name="eval.yaml")
 def main(cfg: DictConfig) -> None:
-    # apply extra utilities
-    # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
-    utils.extras(cfg)
-
     evaluate(cfg)
 
 
