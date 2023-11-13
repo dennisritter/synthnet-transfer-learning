@@ -4,9 +4,9 @@ import numpy as np
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
 
 from datamodules.dataloaders import MultiDataParallelLoader
+from datamodules.datasets import ImageFolderWithPaths
 
 
 class GenericAdaptationDM(pl.LightningDataModule):
@@ -90,10 +90,10 @@ class GenericAdaptationDM(pl.LightningDataModule):
         pass
 
     def setup(self, stage=None):
-        self.train_src = [ImageFolder(train_src_dir) for train_src_dir in self.train_src_dirs]
-        self.train_target = [ImageFolder(train_target_dir) for train_target_dir in self.train_target_dirs]
-        self.val = [ImageFolder(val_dir) for val_dir in self.val_dirs]
-        self.test = [ImageFolder(test_dir) for test_dir in self.test_dirs]
+        self.train_src = [ImageFolderWithPaths(train_src_dir) for train_src_dir in self.train_src_dirs]
+        self.train_target = [ImageFolderWithPaths(train_target_dir) for train_target_dir in self.train_target_dirs]
+        self.val = [ImageFolderWithPaths(val_dir) for val_dir in self.val_dirs]
+        self.test = [ImageFolderWithPaths(test_dir) for test_dir in self.test_dirs]
 
         for train_src_ds in self.train_src:
             train_src_ds.transform = self.train_transform

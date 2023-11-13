@@ -72,7 +72,7 @@ class VitModule(LightningModule):
         self.val_acc_best.reset()
 
     def model_step(self, batch_src: Any):
-        x, y = batch_src
+        x, y, paths = batch_src
 
         output_classifier = self.forward(x)
         logits_classifier = output_classifier["logits"]
@@ -80,10 +80,10 @@ class VitModule(LightningModule):
         loss_classifier = self.criterion_classifier(logits_classifier, y)
         preds_classifier = torch.argmax(logits_classifier, dim=1)
 
-        return loss_classifier, preds_classifier, logits_classifier, features_classifier, y
+        return loss_classifier, preds_classifier, logits_classifier, features_classifier, y, paths
 
     def training_step(self, batch: Any, batch_idx: int):
-        loss, preds, logits, features, targets = self.model_step(batch)
+        loss, preds, logits, features, targets, paths = self.model_step(batch)
 
         # update and log metrics
         self.train_loss(loss)
@@ -109,7 +109,7 @@ class VitModule(LightningModule):
         pass
 
     def validation_step(self, batch: Any, batch_idx: int):
-        loss, preds, logits, features, targets = self.model_step(batch)
+        loss, preds, logits, features, targets, paths = self.model_step(batch)
 
         # update and log metrics
         self.val_loss(loss)
@@ -131,8 +131,23 @@ class VitModule(LightningModule):
         self.targets_test_all = None
         self.cls_tokens_all = None
 
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+        x, y, paths = batch
+        output_classifier = self.forward(x)
+        logits_classifier = output_classifier["logits"]
+        features_classifier = output_classifier["hidden_states"][-1][:, 0, :]
+        preds_classifier = torch.argmax(logits_classifier, dim=1)
+
+        return {
+            "preds": preds_classifier,
+            "targets": y,
+            "logits": logits_classifier,
+            "features": features_classifier,
+            "paths": paths,
+        }
+
     def test_step(self, batch: Any, batch_idx: int):
-        loss, preds, logits, features, targets = self.model_step(batch)
+        loss, preds, logits, features, targets, paths = self.model_step(batch)
 
         # update and log metrics
         self.test_loss(loss)

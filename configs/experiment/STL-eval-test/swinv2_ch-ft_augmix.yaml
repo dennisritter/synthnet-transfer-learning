@@ -23,7 +23,8 @@ logger:
     tags: ${tags}
 
 data:
-  toy: True
+  shuffle_train: false
+  toy: true
   batch_size: 8
   num_workers: 4
   image_size_h: 192
