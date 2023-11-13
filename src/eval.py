@@ -1,3 +1,4 @@
+import pickle  # nosec
 from typing import List, Tuple
 
 import hydra
@@ -84,7 +85,19 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
         paths += pd["paths"]
     test_predictions = {"preds": preds, "targets": targets, "logits": logits, "features": features, "paths": paths}
 
-    # TODO: Store prediction and features in a file
+    # output_dir = cfg.paths.output_dir
+
+    path_feature_train = {
+        path: feature for path, feature in zip(train_predictions["paths"], train_predictions["features"])
+    }
+    path_feature_test = {
+        path: feature for path, feature in zip(test_predictions["paths"], test_predictions["features"])
+    }
+    with open(f"{cfg.paths.output_dir}/path_feature_train.pkl", "wb") as f:
+        pickle.dump(path_feature_train, f)
+    with open(f"{cfg.paths.output_dir}/path_feature_test.pkl", "wb") as f:
+        pickle.dump(path_feature_test, f)
+
     # TODO: Calc Metrics
 
     # metric_dict = trainer.callback_metrics
