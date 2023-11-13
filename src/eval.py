@@ -1,6 +1,8 @@
 from typing import List, Tuple
 
 import hydra
+import pytorch_lightning as pl
+import torch
 from omegaconf import DictConfig
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.loggers import Logger
@@ -25,6 +27,8 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     """
 
     # assert cfg.ckpt_path
+    if cfg.get("seed"):
+        pl.seed_everything(cfg.seed, workers=True)
 
     log.info(f"Instantiating datamodule <{cfg.data._target_}>")
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
@@ -51,14 +55,39 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
         log.info("Logging hyperparameters!")
         utils.log_hyperparameters(object_dict)
 
-    log.info("Starting testing!")
-    trainer.test(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
+    # Make sure you check enabled transforms for train_loader (you probably want to disable them)
+    train_loader = datamodule.train_dataloader(shuffle=False)
+    test_loader = datamodule.test_dataloader()
 
-    # for predictions use trainer.predict(...)
-    # predictions = trainer.predict(model=model, dataloaders=dataloaders, ckpt_path=cfg.ckpt_path)
+    log.info("Run [TRAIN DATASET] Predictions!")
+    predictions = trainer.predict(model=model, dataloaders=train_loader, ckpt_path=cfg.ckpt_path)
+    # print(predictions)
+
+    preds, targets, logits, features, paths = [], [], [], [], []
+    for pd in predictions:
+        preds += pd["preds"].tolist()
+        targets += pd["targets"].tolist()
+        logits += pd["logits"].tolist()
+        features += pd["features"]
+        paths += pd["paths"]
+    train_predictions = {"preds": preds, "targets": targets, "logits": logits, "features": features, "paths": paths}
+
+    log.info("Run [TEST DATASET] Predictions!")
+    predictions = trainer.predict(model=model, dataloaders=test_loader, ckpt_path=cfg.ckpt_path)
+
+    preds, targets, logits, features, paths = [], [], [], [], []
+    for pd in predictions:
+        preds += pd["preds"].tolist()
+        targets += pd["targets"].tolist()
+        logits += pd["logits"].tolist()
+        features += pd["features"]
+        paths += pd["paths"]
+    test_predictions = {"preds": preds, "targets": targets, "logits": logits, "features": features, "paths": paths}
+
+    # TODO: Store prediction and features in a file
+    # TODO: Calc Metrics
 
     # metric_dict = trainer.callback_metrics
-
     # return metric_dict, object_dict
 
 
