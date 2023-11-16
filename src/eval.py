@@ -1,7 +1,9 @@
 import pickle  # nosec
 from typing import List, Tuple
 
+import faiss
 import hydra
+import numpy as np
 import pytorch_lightning as pl
 import torch
 from omegaconf import DictConfig
@@ -64,28 +66,40 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     predictions = trainer.predict(model=model, dataloaders=train_loader, ckpt_path=cfg.ckpt_path)
     # print(predictions)
 
-    preds, targets, logits, features, paths = [], [], [], [], []
+    train_preds, train_targets, train_logits, train_features, train_paths = [], [], [], [], []
     for pd in predictions:
-        preds += pd["preds"].tolist()
-        targets += pd["targets"].tolist()
-        logits += pd["logits"].tolist()
-        features += pd["features"]
-        paths += pd["paths"]
-    train_predictions = {"preds": preds, "targets": targets, "logits": logits, "features": features, "paths": paths}
+        train_preds += pd["preds"].tolist()
+        train_targets += pd["targets"].tolist()
+        train_logits += pd["logits"].tolist()
+        train_features += pd["features"]
+        train_paths += pd["paths"]
+    train_features = [feat.numpy() for feat in train_features]
+    train_predictions = {
+        "preds": train_preds,
+        "targets": train_targets,
+        "logits": train_logits,
+        "features": train_features,
+        "paths": train_paths,
+    }
 
     log.info("Run [TEST DATASET] Predictions!")
     predictions = trainer.predict(model=model, dataloaders=test_loader, ckpt_path=cfg.ckpt_path)
 
-    preds, targets, logits, features, paths = [], [], [], [], []
+    test_preds, test_targets, test_logits, test_features, test_paths = [], [], [], [], []
     for pd in predictions:
-        preds += pd["preds"].tolist()
-        targets += pd["targets"].tolist()
-        logits += pd["logits"].tolist()
-        features += pd["features"]
-        paths += pd["paths"]
-    test_predictions = {"preds": preds, "targets": targets, "logits": logits, "features": features, "paths": paths}
-
-    # output_dir = cfg.paths.output_dir
+        test_preds += pd["preds"].tolist()
+        test_targets += pd["targets"].tolist()
+        test_logits += pd["logits"].tolist()
+        test_features += pd["features"]
+        test_paths += pd["paths"]
+    test_features = [feat.numpy() for feat in test_features]
+    test_predictions = {
+        "preds": test_preds,
+        "targets": test_targets,
+        "logits": test_logits,
+        "features": test_features,
+        "paths": test_paths,
+    }
 
     path_feature_train = {
         path: feature for path, feature in zip(train_predictions["paths"], train_predictions["features"])
@@ -98,7 +112,10 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     with open(f"{cfg.paths.output_dir}/path_feature_test.pkl", "wb") as f:
         pickle.dump(path_feature_test, f)
 
-    # TODO: Calc Metrics
+    feature_size = train_predictions["features"][0].shape[0]
+    index_flat_l2 = faiss.IndexFlatL2(feature_size)
+    index_flat_l2.add(np.array(train_predictions["features"]))  # pylint: disable=no-value-for-parameter
+    faiss.write_index(index_flat_l2, f"{cfg.paths.output_dir}/index_flat_l2.faiss")
 
     # metric_dict = trainer.callback_metrics
     # return metric_dict, object_dict
