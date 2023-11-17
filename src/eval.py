@@ -11,6 +11,7 @@ from pytorch_lightning import LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.loggers import Logger
 
 import utils
+from utils import metrics
 
 # pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
@@ -117,6 +118,7 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     index_flat_l2.add(np.array(train_predictions["features"]))  # pylint: disable=no-value-for-parameter
     faiss.write_index(index_flat_l2, f"{cfg.paths.output_dir}/index_flat_l2.faiss")
 
+    mmd = metrics.mmd(np.array(train_predictions["features"]), np.array(test_predictions["features"]))
     # metric_dict = trainer.callback_metrics
     # return metric_dict, object_dict
 

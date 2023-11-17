@@ -8,6 +8,7 @@ scikit-learn
 pytorch-lightning       # pytorch lightning
 torchvision
 opencv-python
+faiss-gpu
 # --- config & logging ---
 wandb
 omegaconf
