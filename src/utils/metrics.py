@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.special import kl_div
+from scipy.stats import gaussian_kde
 
 
 def _kernel_matrix(X, Y, kernel_func):
@@ -25,3 +27,33 @@ def mmd(X, Y, kernel_func=_gaussian_kernel):
     K_XY = _kernel_matrix(X, Y, kernel_func)
     mmd = np.mean(K_XX) + np.mean(K_YY) - 2 * np.mean(K_XY)
     return mmd
+
+
+def kl_divergence(source_feature_vectors, target_feature_vectors):
+    """Calculate KL divergence between distributions estimated from source and target feature vectors.
+
+    Arguments:
+    source_feature_vectors -- Feature vectors from the source domain (numpy array)
+    target_feature_vectors -- Feature vectors from the target domain (numpy array)
+
+    Returns:
+    kl_divergence -- KL divergence value
+    """
+    # Perform KDE on source and target feature vectors
+    source_kde = gaussian_kde(source_feature_vectors.T)
+    target_kde = gaussian_kde(target_feature_vectors.T)
+
+    # Evaluate the estimated densities at some points
+    x = np.linspace(
+        min(min(source_feature_vectors), min(target_feature_vectors)),
+        max(max(source_feature_vectors), max(target_feature_vectors)),
+        1000,
+    )
+
+    source_density = source_kde(x)
+    target_density = target_kde(x)
+
+    # Compute KL divergence
+    kl_divergence = kl_div(source_density, target_density)
+
+    return kl_divergence
