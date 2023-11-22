@@ -119,6 +119,10 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     faiss.write_index(index_flat_l2, f"{cfg.paths.output_dir}/index_flat_l2.faiss")
 
     mmd = metrics.mmd(np.array(train_predictions["features"]), np.array(test_predictions["features"]))
+
+    print("======== RESULTS ========")
+    print(f"{mmd=}")
+    print("======== END ========")
     # metric_dict = trainer.callback_metrics
     # return metric_dict, object_dict
 
