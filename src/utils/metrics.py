@@ -43,15 +43,8 @@ def kl_divergence(source_feature_vectors, target_feature_vectors):
     source_kde = gaussian_kde(source_feature_vectors.T)
     target_kde = gaussian_kde(target_feature_vectors.T)
 
-    # Evaluate the estimated densities at some points
-    x = np.linspace(
-        min(min(source_feature_vectors), min(target_feature_vectors)),
-        max(max(source_feature_vectors), max(target_feature_vectors)),
-        1000,
-    )
-
-    source_density = source_kde(x)
-    target_density = target_kde(x)
+    source_density = source_kde(source_feature_vectors.T)
+    target_density = target_kde(target_feature_vectors.T)
 
     # Compute KL divergence
     kl_divergence = kl_div(source_density, target_density)
