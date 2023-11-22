@@ -8,7 +8,7 @@ defaults:
 
 seed: 42
 task_name: "eval"
-ckpt_path: out/checkpoints/topex-printer/swinv2_ch-ft_augmix.ckpt
+ckpt_path: out/checkpoints/topex-printer/swinv2_ch_sgd1e-3.ckpt
 
 model:
   model_name: "microsoft/swinv2-base-patch4-window12-192-22k"

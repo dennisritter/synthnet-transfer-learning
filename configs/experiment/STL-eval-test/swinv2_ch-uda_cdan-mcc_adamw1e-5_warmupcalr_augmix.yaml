@@ -2,18 +2,20 @@
 
 defaults:
   - override /data: generic_topex.yaml
-  - override /model: vit.yaml
+  - override /model: vit_cdan.yaml
   - override /callbacks: default_eval.yaml
   - override /trainer: default.yaml
 
 seed: 42
 task_name: "eval"
-ckpt_path: out/checkpoints/topex-printer/swinv2_ch-ft_augmix.ckpt
+ckpt_path: out/checkpoints/topex-printer/swinv2_ch-uda_cdan-mcc_adamw1e-5_warmupcalr_augmix.ckpt
 
 model:
   model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
   optimizer: null
   scheduler: null
+  cdan_ddisc_in_feature: 1024
+  cdan_ddisc_hidden_size: 1024
 
 logger:
   wandb:
