@@ -189,6 +189,21 @@ class VitCDANModule(LightningModule):
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True)
 
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+        x, y, paths = batch
+        output_classifier = self.forward(x)
+        logits_classifier = output_classifier["logits"]
+        features_classifier = output_classifier["hidden_states"][-1][:, 0, :]
+        preds_classifier = torch.argmax(logits_classifier, dim=1)
+
+        return {
+            "preds": preds_classifier,
+            "targets": y,
+            "logits": logits_classifier,
+            "features": features_classifier,
+            "paths": paths,
+        }
+
     def on_test_epoch_start(self):
         self.preds_test_all = None
         self.targets_test_all = None
