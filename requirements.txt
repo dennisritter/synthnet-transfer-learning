@@ -2,7 +2,7 @@ transformers
 datasets
 evaluate
 
-numpy
+numpy==1.24 # numba needs numpy 1.24 or less
 numba
 scikit-learn
 pytorch-lightning       # pytorch lightning
