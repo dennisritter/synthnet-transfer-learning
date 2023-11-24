@@ -14,7 +14,7 @@ def _kernel_matrix(X, Y, kernel_func):
     return K
 
 
-def _gaussian_kernel(x, y, sigma=1):
+def _gaussian_kernel(x, y, sigma=1.0):
     """Calculates the Gaussian kernel between two input vectors x and y with the given sigma value."""
     return np.exp(-np.linalg.norm(x - y) ** 2 / (2 * sigma**2))
 
@@ -29,24 +29,29 @@ def mmd(X, Y, kernel_func=_gaussian_kernel):
     return mmd
 
 
-def kl_divergence(source_feature_vectors, target_feature_vectors):
+def kl_divergence(source_feature_vectors, target_feature_vectors, num_samples=2048):
     """Calculate KL divergence between distributions estimated from source and target feature vectors.
 
     Arguments:
     source_feature_vectors -- Feature vectors from the source domain (numpy array)
     target_feature_vectors -- Feature vectors from the target domain (numpy array)
+    num_samples -- Number of samples for KDE estimation (default: 1000)
 
     Returns:
     kl_divergence -- KL divergence value
     """
-    # Perform KDE on source and target feature vectors
-    source_kde = gaussian_kde(source_feature_vectors.T)
-    target_kde = gaussian_kde(target_feature_vectors.T)
+    # Randomly sample points for KDE estimation
+    source_samples = source_feature_vectors[np.random.choice(source_feature_vectors.shape[0], num_samples, replace=False)]
+    target_samples = target_feature_vectors[np.random.choice(target_feature_vectors.shape[0], num_samples, replace=False)]
 
-    source_density = source_kde(source_feature_vectors.T)
-    target_density = target_kde(target_feature_vectors.T)
+    # Perform KDE on source and target feature vectors
+    source_kde = gaussian_kde(source_samples.T)
+    target_kde = gaussian_kde(target_samples.T)
+
+    source_density = source_kde(source_samples.T)
+    target_density = target_kde(target_samples.T)
 
     # Compute KL divergence
     kl_divergence = kl_div(source_density, target_density)
 
-    return kl_divergence
+    return np.sum(kl_divergence)

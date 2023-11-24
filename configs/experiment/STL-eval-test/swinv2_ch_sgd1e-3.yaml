@@ -24,7 +24,7 @@ logger:
 
 data:
   shuffle_train: false
-  # toy: true
+  toy: false
   batch_size: 8
   num_workers: 4
   image_size_h: 192
