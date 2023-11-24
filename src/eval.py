@@ -59,26 +59,15 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
         log.info("Logging hyperparameters!")
         utils.log_hyperparameters(object_dict)
 
-<<<<<<< Updated upstream
-    # Make sure you check enabled transforms for train_loader (you probably want to disable them)
-=======
->>>>>>> Stashed changes
     train_loader = datamodule.train_dataloader(shuffle=False)
     test_loader = datamodule.test_dataloader()
 
     log.info("Run [TRAIN DATASET] Predictions!")
-<<<<<<< Updated upstream
-    predictions = trainer.predict(model=model, dataloaders=train_loader, ckpt_path=cfg.ckpt_path)
-    # print(predictions)
 
-    train_preds, train_targets, train_logits, train_features, train_paths = [], [], [], [], []
-    for pd in predictions:
-=======
     train_predictions = trainer.predict(model=model, dataloaders=train_loader, ckpt_path=cfg.ckpt_path)
 
     train_preds, train_targets, train_logits, train_features, train_paths = [], [], [], [], []
     for pd in train_predictions:
->>>>>>> Stashed changes
         train_preds += pd["preds"].tolist()
         train_targets += pd["targets"].tolist()
         train_logits += pd["logits"].tolist()
@@ -92,43 +81,7 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
         "features": train_features,
         "paths": train_paths,
     }
-<<<<<<< Updated upstream
 
-    log.info("Run [TEST DATASET] Predictions!")
-    predictions = trainer.predict(model=model, dataloaders=test_loader, ckpt_path=cfg.ckpt_path)
-
-    test_preds, test_targets, test_logits, test_features, test_paths = [], [], [], [], []
-    for pd in predictions:
-        test_preds += pd["preds"].tolist()
-        test_targets += pd["targets"].tolist()
-        test_logits += pd["logits"].tolist()
-        test_features += pd["features"]
-        test_paths += pd["paths"]
-    test_features = [feat.numpy() for feat in test_features]
-    test_predictions = {
-        "preds": test_preds,
-        "targets": test_targets,
-        "logits": test_logits,
-        "features": test_features,
-        "paths": test_paths,
-    }
-
-    path_feature_train = {
-        path: feature for path, feature in zip(train_predictions["paths"], train_predictions["features"])
-    }
-    path_feature_test = {
-        path: feature for path, feature in zip(test_predictions["paths"], test_predictions["features"])
-    }
-    with open(f"{cfg.paths.output_dir}/path_feature_train.pkl", "wb") as f:
-        pickle.dump(path_feature_train, f)
-    with open(f"{cfg.paths.output_dir}/path_feature_test.pkl", "wb") as f:
-        pickle.dump(path_feature_test, f)
-
-    feature_size = train_predictions["features"][0].shape[0]
-    index_flat_l2 = faiss.IndexFlatL2(feature_size)
-    index_flat_l2.add(np.array(train_predictions["features"]))  # pylint: disable=no-value-for-parameter
-    faiss.write_index(index_flat_l2, f"{cfg.paths.output_dir}/index_flat_l2.faiss")
-=======
 
     log.info("Run [TEST DATASET] Predictions!")
     test_predictions = trainer.predict(model=model, dataloaders=test_loader, ckpt_path=cfg.ckpt_path)
@@ -148,20 +101,7 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
         "features": test_features,
         "paths": test_paths,
     }
->>>>>>> Stashed changes
 
-    mmd = metrics.mmd(np.array(train_predictions["features"]), np.array(test_predictions["features"]))
-    kld = metrics.kl_divergence(np.array(train_predictions["features"]), np.array(test_predictions["features"]))
-
-    print("======== RESULTS ========")
-    print(f"{mmd=}")
-    print(f"{kld=}")
-    print("======== END ========")
-    # metric_dict = trainer.callback_metrics
-    # return metric_dict, object_dict
-
-<<<<<<< Updated upstream
-=======
     # SAVE PREDICTIONS
     # with open(f"{cfg.paths.output_dir}/train_predictions.pkl", "wb") as f:
     #     pickle.dump(train_predictions, f)
@@ -199,7 +139,6 @@ def evaluate(cfg: DictConfig) -> Tuple[dict, dict]:
     # print(f"{kld=}")
     # print("======== END ========")
 
->>>>>>> Stashed changes
 
 @hydra.main(version_base=None, config_path="../configs", config_name="eval.yaml")
 def main(cfg: DictConfig) -> None:
