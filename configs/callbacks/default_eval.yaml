@@ -1,0 +1,11 @@
+defaults:
+  - rich_progress_bar.yaml
+  - log_prediction_samples.yaml
+  - log_training_samples.yaml
+  - _self_
+
+log_prediction_samples:
+  n: 8
+
+log_training_samples:
+  n: 8

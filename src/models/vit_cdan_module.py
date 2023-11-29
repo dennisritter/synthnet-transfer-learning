@@ -42,6 +42,7 @@ class VitCDANModule(LightningModule):
         cdan_ddisc_entropy_conditioning: bool = False,
         mcc: bool = False,
         mcc_temperature: float = 1.0,
+        extract_features_only: bool = False,
     ):
         super().__init__()
 
@@ -103,6 +104,8 @@ class VitCDANModule(LightningModule):
             self.train_loss_mcc = MeanMetric()
 
     def forward(self, x: torch.Tensor):
+        if self.hparams.extract_features_only:
+            return self.net(x)["hidden_states"][-1][:, 0, :]
         return self.net(x)
 
     def on_train_start(self):
@@ -111,7 +114,7 @@ class VitCDANModule(LightningModule):
         self.val_acc_best.reset()
 
     def model_step(self, batch_src: Any):
-        x, y = batch_src
+        x, y, paths = batch_src
 
         output_classifier = self.forward(x)
         logits_classifier = output_classifier["logits"]
@@ -188,6 +191,21 @@ class VitCDANModule(LightningModule):
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True)
+
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+        x, y, paths = batch
+        output_classifier = self.forward(x)
+        logits_classifier = output_classifier["logits"]
+        features_classifier = output_classifier["hidden_states"][-1][:, 0, :]
+        preds_classifier = torch.argmax(logits_classifier, dim=1)
+
+        return {
+            "preds": preds_classifier,
+            "targets": y,
+            "logits": logits_classifier,
+            "features": features_classifier,
+            "paths": paths,
+        }
 
     def on_test_epoch_start(self):
         self.preds_test_all = None

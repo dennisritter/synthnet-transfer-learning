@@ -3,6 +3,7 @@ train_dir: ${paths.data_dir}visda2017/train
 val_dir: ${paths.data_dir}visda2017/val
 test_dir: ${paths.data_dir}visda2017/test
 batch_size: 32
+shuffle_train: true
 num_workers: 4
 toy: false
 image_size_h: 224
