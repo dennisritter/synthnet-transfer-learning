@@ -1,0 +1,39 @@
+# @package _global_
+
+defaults:
+  - override /data: generic_topex.yaml
+  - override /model: vit.yaml
+  - override /callbacks: default_eval.yaml
+  - override /trainer: default.yaml
+
+seed: 42
+task_name: "eval"
+ckpt_path: out/checkpoints/topex-printer/swinv2_ch_sgd1e-3.ckpt
+
+model:
+  model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
+  optimizer: null
+  scheduler: null
+
+logger:
+  wandb:
+    project: STL-eval-test
+    job_type: "Evaluation"
+    name: ${hydra:runtime.choices.experiment}
+    tags: ${tags}
+
+data:
+  shuffle_train: false
+  toy: true
+  batch_size: 8
+  num_workers: 4
+  image_size_h: 192
+  image_size_w: 192
+  resize: true
+  random_resized_crop: false
+  center_crop: false
+  random_horizontal_flip: false
+  random_vertical_flip: false
+  random_color_jitter: false
+  random_grayscale: false
+  augmix: false

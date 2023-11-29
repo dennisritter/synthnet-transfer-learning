@@ -16,7 +16,8 @@ import numpy as np
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
+
+from datamodules.datasets import ImageFolderWithPaths
 
 
 class BaselineFinetuneDM(pl.LightningDataModule):
@@ -65,10 +66,10 @@ class BaselineFinetuneDM(pl.LightningDataModule):
         pass
 
     def setup(self, stage=None):
-        self.train, self.val = random_split(ImageFolder(self.train_dir), [0.8, 0.2])
+        self.train, self.val = random_split(ImageFolderWithPaths(self.train_dir), [0.8, 0.2])
         self.train = self.train.dataset
         self.val = self.val.dataset
-        self.test = ImageFolder(self.test_dir)
+        self.test = ImageFolderWithPaths(self.test_dir)
 
         self.train.transform = self.train_transform
         self.val.transform = self.val_transform

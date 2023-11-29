@@ -1,0 +1,41 @@
+# @package _global_
+
+defaults:
+  - override /data: generic_topex.yaml
+  - override /model: vit_cdan.yaml
+  - override /callbacks: default_eval.yaml
+  - override /trainer: default.yaml
+
+seed: 42
+task_name: "eval"
+ckpt_path: out/checkpoints/topex-printer/swinv2_ch-uda_cdan-mcc_adamw1e-5_warmupcalr_augmix.ckpt
+
+model:
+  model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
+  optimizer: null
+  scheduler: null
+  cdan_ddisc_in_feature: 1024
+  cdan_ddisc_hidden_size: 1024
+
+logger:
+  wandb:
+    project: STL-eval-test
+    job_type: "Evaluation"
+    name: ${hydra:runtime.choices.experiment}
+    tags: ${tags}
+
+data:
+  shuffle_train: false
+  # toy: true
+  batch_size: 8
+  num_workers: 4
+  image_size_h: 192
+  image_size_w: 192
+  resize: true
+  random_resized_crop: false
+  center_crop: false
+  random_horizontal_flip: false
+  random_vertical_flip: false
+  random_color_jitter: false
+  random_grayscale: false
+  augmix: false

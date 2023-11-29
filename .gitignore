@@ -137,7 +137,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-
 # CUSTOM
 __MACOSX
 .vscode/
@@ -149,3 +148,4 @@ out
 wandb
 logs
 outputs
+.python-version

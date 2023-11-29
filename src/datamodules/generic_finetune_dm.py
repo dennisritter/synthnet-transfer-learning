@@ -4,7 +4,8 @@ import numpy as np
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
+
+from datamodules.datasets import ImageFolderWithPaths
 
 
 class GenericFinetuneDM(pl.LightningDataModule):
@@ -15,6 +16,7 @@ class GenericFinetuneDM(pl.LightningDataModule):
         test_dir: str = None,
         batch_size: int = 64,
         num_workers: int = 4,
+        shuffle_train: bool = True,
         toy: bool = False,
         image_size_w: int = 224,
         image_size_h: int = 224,
@@ -87,17 +89,17 @@ class GenericFinetuneDM(pl.LightningDataModule):
 
     def setup(self, stage=None):
         if self.val_dir:
-            self.train = ImageFolder(self.train_dir)
-            self.val = ImageFolder(self.val_dir)
+            self.train = ImageFolderWithPaths(self.train_dir)
+            self.val = ImageFolderWithPaths(self.val_dir)
         else:
             # TODO: FIX TRANSFORMS - train and val access the same dataset. Results in train_transforms not applied!
             # TODO: Research: how to split from train set but using different transforms?
             # self.train, self.val = random_split(ImageFolder(self.train_dir), [0.8, 0.2])
-            self.train = ImageFolder(self.train_dir)
+            self.train = ImageFolderWithPaths(self.train_dir)
             # NOTE: use TEST SET for validation
-            self.val = ImageFolder(self.test_dir)
+            self.val = ImageFolderWithPaths(self.test_dir)
 
-        self.test = ImageFolder(self.test_dir)
+        self.test = ImageFolderWithPaths(self.test_dir)
 
         self.train.transform = self.train_transform
         self.val.transform = self.val_transform
@@ -114,8 +116,8 @@ class GenericFinetuneDM(pl.LightningDataModule):
             self.val = Subset(self.val, np.random.choice(np.arange(len(self.val)), size=80, replace=False))
             self.test = Subset(self.test, np.random.choice(np.arange(len(self.test)), size=80, replace=False))
 
-    def train_dataloader(self):
-        return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
+    def train_dataloader(self, shuffle=True):
+        return DataLoader(dataset=self.train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=shuffle)
 
     def val_dataloader(self):
         return DataLoader(dataset=self.val, batch_size=self.batch_size, num_workers=self.num_workers)

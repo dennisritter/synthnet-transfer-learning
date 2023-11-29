@@ -91,7 +91,7 @@ class VitMCCModule(LightningModule):
         self.val_acc_best.reset()
 
     def model_step(self, batch_src: Any):
-        x, y = batch_src
+        x, y, paths = batch_src
 
         output_classifier = self.forward(x)
         logits_classifier = output_classifier["logits"]
