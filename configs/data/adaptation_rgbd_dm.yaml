@@ -1,5 +1,5 @@
 _target_: datamodules.adaptation_rgbd_dm.AdaptationRGBD
-train_src_dirs: [data/topex-printer-32-depth/train/rgbd-normalized]
+train_src_dirs: [data/topex-printer-32-depth/train/rgbd-zoedepth]
 train_target_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]
 val_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]
 test_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]

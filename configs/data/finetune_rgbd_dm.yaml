@@ -1,5 +1,5 @@
 _target_: datamodules.finetune_rgbd_dm.FinetuneRGBD
-train_dir: ${paths.data_dir}topex-printer-32-depth/train/rgbd-normalized
+train_dir: ${paths.data_dir}topex-printer-32-depth/train/rgbd-zoedepth
 val_dir: ${paths.data_dir}topex-printer-32-depth/test/rgbd-zoedepth
 test_dir: ${paths.data_dir}topex-printer-32-depth/test/rgbd-zoedepth
 batch_size: 16
