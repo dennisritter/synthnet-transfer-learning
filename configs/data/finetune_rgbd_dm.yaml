@@ -3,7 +3,6 @@ train_dir: ${paths.data_dir}topex-printer-32-depth/train/rgbd-normalized
 val_dir: ${paths.data_dir}topex-printer-32-depth/test/rgbd-normalized
 test_dir: ${paths.data_dir}topex-printer-32-depth/test/rgbd-normalized
 batch_size: 32
-shuffle_train: true
 num_workers: 4
 toy: false
 image_size_h: 224
