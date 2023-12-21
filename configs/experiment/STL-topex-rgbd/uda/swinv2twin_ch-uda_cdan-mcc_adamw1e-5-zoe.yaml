@@ -16,7 +16,6 @@ tags:
     "Domain Adaptation",
     "CDAN-MCC",
     "CosineAnnealingLR",
-    "augmix",
   ]
 
 seed: 42
