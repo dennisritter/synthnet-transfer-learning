@@ -26,6 +26,7 @@ class SwinV2RGBDModule(LightningModule):
         num_classes: int,
         scheduler: torch.optim.lr_scheduler = None,
         fine_tuning_checkpoint: str = None,
+        cls_ckpt: str = None,
         cdan: bool = False,
         cdan_ddisc_in_feature: int = 768,
         cdan_ddisc_hidden_size: int = 1024,
@@ -42,6 +43,8 @@ class SwinV2RGBDModule(LightningModule):
         self.cdan = cdan
         self.mcc = mcc
         classifier = torch.nn.Linear(in_features=1024 * 2, out_features=num_classes, bias=True)
+        if cls_ckpt:
+            classifier.load_state_dict(torch.load(cls_ckpt)["model_rgbd_classifier_state_dict"])
         if model_name == "swinv2_twin_rgbd":
             self.net = SwinV2TwinRGBD(classifier=classifier)
         else:
