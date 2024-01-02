@@ -53,7 +53,7 @@ logger:
     tags: ${tags}
 
 data:
-  train_src_dirs: [data/topex-printer-32-depth/train/rgbd-norm]
+  train_src_dirs: [data/topex-printer-32-depth/train/rgbd-normalized]
   train_target_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]
   image_size_h: 192
   image_size_w: 192
