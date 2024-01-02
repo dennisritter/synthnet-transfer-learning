@@ -26,7 +26,7 @@ trainer:
 
 model:
   model_name: "swinv2_twin_rgbd"
-  fine_tuning_checkpoint: out/synthnet-transfer-learning-outputs/train/multiruns/STL-topex-rgbd/src_only/swinv2twin_ch_sgd1e-3-zoe/2023-12-19_14-50-23/0/checkpoints/epoch_019.ckpt
+  fine_tuning_checkpoint: out/synthnet-transfer-learning-outputs/train/multiruns/STL-topex-rgbd/src_only/swinv2twin_ch_sgd1e-3-zoe/2024-01-02_09-35-43/0/checkpoints/epoch_018.ckpt
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
