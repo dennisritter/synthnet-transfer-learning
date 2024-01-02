@@ -3,7 +3,7 @@ train_src_dirs: [data/topex-printer-32-depth/train/rgbd-zoedepth]
 train_target_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]
 val_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]
 test_dirs: [data/topex-printer-32-depth/test/rgbd-zoedepth]
-batch_size: 16
+batch_size: 32
 num_workers: 4
 image_size_h: 224
 image_size_w: 224
