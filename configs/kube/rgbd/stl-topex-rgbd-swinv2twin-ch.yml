@@ -44,8 +44,7 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/train.py -m 'experiment=
-          STL-topex-rgbd/src_only/swinv2twin_ch_sgd1e-3-zoe,
-          STL-topex-rgbd/src_only/swinv2twin_ch_sgd1e-3-norm'
+          STL-topex-rgbd/src_only/swinv2_late-concat_ch_sgd1e-3-zoe'
       resources:
         limits:
           nvidia.com/gpu: 1

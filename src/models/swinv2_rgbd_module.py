@@ -10,6 +10,7 @@ from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
+from models.components.swinv2_fusion_rgbd import SwinV2FusionRGBD
 from models.components.swinv2_twin_rgbd import SwinV2TwinRGBD
 from tllib.alignment.cdan import ConditionalDomainAdversarialLoss
 from tllib.modules.domain_discriminator import DomainDiscriminator
@@ -47,9 +48,11 @@ class SwinV2RGBDModule(LightningModule):
             classifier.load_state_dict(torch.load(cls_ckpt)["model_rgbd_classifier_state_dict"])
         if model_name == "swinv2_twin_rgbd":
             self.net = SwinV2TwinRGBD(classifier=classifier)
+        elif model_name == "swinv2_fusion_rgbd":
+            self.net = SwinV2FusionRGBD(classifier=classifier)
         else:
-            raise NotImplementedError("Only swinv2_twin_rgbd model is supported at the moment")
-        # TODO: implement checkpoint loading for rgb AND depth models
+            raise NotImplementedError("The given model name model is supported at the moment")
+
         if fine_tuning_checkpoint:
             weights = torch.load(fine_tuning_checkpoint)["state_dict"]
             weights_rn = OrderedDict()
