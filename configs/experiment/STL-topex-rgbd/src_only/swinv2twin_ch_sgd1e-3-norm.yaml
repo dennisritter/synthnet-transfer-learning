@@ -46,3 +46,10 @@ data:
   train_dir: ${paths.data_dir}topex-printer-32-depth/train/rgbd-normalized
   image_size_h: 192
   image_size_w: 192
+  random_resized_crop: true
+  random_horizontal_flip: true
+  center_crop: false
+  random_vertical_flip: false
+  random_color_jitter: false
+  random_grayscale: false
+  augmix: false
