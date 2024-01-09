@@ -12,7 +12,7 @@ defaults:
 tags:
   [
     "topex",
-    "swinv2",
+    "swinv2 Twin",
     "class head only",
     "SGD",
     "baseline augmentations",
@@ -27,7 +27,7 @@ trainer:
   # fast_dev_run: true
 
 model:
-  model_name: "swinv2_fusion_rgbd"
+  model_name: "swinv2_twin_rgbd"
   optimizer:
     _target_: torch.optim.SGD
     lr: 0.001

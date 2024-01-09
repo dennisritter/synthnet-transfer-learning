@@ -30,7 +30,7 @@ model:
   model_name: "swinv2_twin_rgbd"
   optimizer:
     _target_: torch.optim.SGD
-    lr: 0.001
+    lr: 0.0001
     momentum: 0.9
     weight_decay: 0.0
   scheduler: null
@@ -43,7 +43,6 @@ logger:
     tags: ${tags}
 
 data:
-  train_dir: ${paths.data_dir}topex-printer-32-depth/train/rgbd-normalized
   image_size_h: 192
   image_size_w: 192
   random_resized_crop: true
