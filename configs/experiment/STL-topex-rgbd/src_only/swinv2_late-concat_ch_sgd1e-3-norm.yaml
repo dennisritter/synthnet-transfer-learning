@@ -1,0 +1,55 @@
+# @package _global_
+
+defaults:
+  - override /data: finetune_rgbd_dm.yaml
+  - override /model: swinv2_rgbd.yaml
+  - override /callbacks: default_ch.yaml
+  - override /trainer: default.yaml
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags:
+  [
+    "topex",
+    "swinv2",
+    "class head only",
+    "SGD",
+    "baseline augmentations",
+    "RGBD",
+  ]
+
+seed: 42
+
+trainer:
+  min_epochs: 1
+  max_epochs: 20
+  # fast_dev_run: true
+
+model:
+  model_name: "swinv2_fusion_rgbd"
+  optimizer:
+    _target_: torch.optim.SGD
+    lr: 0.001
+    momentum: 0.9
+    weight_decay: 0.0
+  scheduler: null
+
+logger:
+  wandb:
+    project: STL-topex-rgbd
+    job_type: "class head only"
+    name: ${hydra:runtime.choices.experiment}
+    tags: ${tags}
+
+data:
+  train_dir: data/topex-printer-32-depth/train/rgbd-normalized
+  image_size_h: 192
+  image_size_w: 192
+  random_resized_crop: true
+  random_horizontal_flip: true
+  center_crop: false
+  random_vertical_flip: false
+  random_color_jitter: false
+  random_grayscale: false
+  augmix: false
