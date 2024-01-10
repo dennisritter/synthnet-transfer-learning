@@ -22,7 +22,7 @@ model:
 
 logger:
   wandb:
-    project: STL-eval-topex
+    project: STL-eval-confmat-topex
     job_type: "Evaluation"
     name: ${hydra:runtime.choices.experiment}
     tags: ${tags}

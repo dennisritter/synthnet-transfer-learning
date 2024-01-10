@@ -194,16 +194,17 @@ class VitModule(LightningModule):
             }
         )
         # Confusion Matrix (normalized on trues)
-        self.logger.experiment.log(
-            {
-                "test/confmat": wandb.sklearn.plot_confusion_matrix(
-                    y_true=self.targets_test_all.cpu(),
-                    y_pred=self.preds_test_all.cpu(),
-                    labels=class_names,
-                    normalize="true",
-                )
-            }
-        )
+        self.logger.experiment.log({"conf_mat" : wandb.plot.confusion_matrix(probs=None, y_true=self.targets_test_all.cpu().numpy(), preds=self.preds_test_all.cpu().numpy(), class_names=class_names)})
+        # self.logger.experiment.log(
+        #     {
+        #         "test/confmat": wandb.sklearn.plot_confusion_matrix(
+        #             y_true=self.targets_test_all.cpu(),
+        #             y_pred=self.preds_test_all.cpu(),
+        #             labels=class_names,
+        #             normalize="true",
+        #         )
+        #     }
+        # )
         # # TSNE // Embedding projector
         # tsne_cols = np.arange(self.cls_tokens_all.size(dim=1)).astype(str).tolist()
         # tsne_cols.insert(0, "target")
