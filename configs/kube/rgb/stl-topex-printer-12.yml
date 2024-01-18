@@ -44,7 +44,6 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/train.py -m 'experiment=
-          STL-topex-printer-12/src_only/swinv2_ch-ft_augmix,
           STL-topex-printer-12/uda/swinv2_ch-uda_cdan-mcc_adamw1e-5_warmupcalr_augmix'
       resources:
         limits:
