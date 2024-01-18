@@ -56,7 +56,7 @@ class LogPredictionSamplesCallback(Callback):
 
         # Let's log 20 sample image predictions from the first batch
         if batch_idx == 0:
-            x, y = batch
+            x, y, path = batch
             images = [img for img in x[: self.n]]
             idx2label = trainer.datamodule.idx2label
             captions = [
