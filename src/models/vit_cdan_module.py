@@ -131,7 +131,7 @@ class VitCDANModule(LightningModule):
 
         batch_src, batch_target = batch
         loss_classifier, src_preds, src_logits, src_features, src_targets = self.model_step(batch_src)
-        x_target, y_target = batch_target
+        x_target, y_target, path_target = batch_target
         target_net_output = self.forward(x_target)
         target_logits, target_features = target_net_output["logits"], target_net_output["hidden_states"][-1][:, 0, :]
         loss_ddisc = self.criterion_ddisc(src_logits, src_features, target_logits, target_features)
