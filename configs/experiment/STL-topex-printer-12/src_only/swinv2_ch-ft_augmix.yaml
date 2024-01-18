@@ -20,7 +20,7 @@ trainer:
 model:
   # Load model from checkpoint (weights only)
   _target_: models.vit_module.VitModule.load_from_checkpoint
-  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-topex-printer-12/src_only/swinv2_ch_sgd1e-3.yaml/CHECKPOINT
+  checkpoint_path: out/synthnet-transfer-learning-outputs/train/multiruns/STL-topex-printer-12/src_only/swinv2_ch_sgd1e-3.yaml/2024-01-18_14-46-14/0/checkpoints/epoch_019.ckpt
   model_name: "microsoft/swinv2-base-patch4-window12-192-22k"
   optimizer:
     _target_: torch.optim.AdamW
