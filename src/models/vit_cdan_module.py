@@ -129,7 +129,7 @@ class VitCDANModule(LightningModule):
         #       collates data from multiple datasets in parallel
         #       In our use case this represents SOURCE and TARGET domain data for domain adaptation.
 
-        batch_src, batch_target = batch
+        batch_src, batch_target, batch_paths = batch
         loss_classifier, src_preds, src_logits, src_features, src_targets = self.model_step(batch_src)
         x_target, y_target = batch_target
         target_net_output = self.forward(x_target)
@@ -257,7 +257,16 @@ class VitCDANModule(LightningModule):
         )
         # Confusion Matrix (normalized on trues)
 
-        self.logger.experiment.log({"conf_mat" : wandb.plot.confusion_matrix(probs=None, y_true=self.targets_test_all.cpu().numpy(), preds=self.preds_test_all.cpu().numpy(), class_names=class_names)})
+        self.logger.experiment.log(
+            {
+                "conf_mat": wandb.plot.confusion_matrix(
+                    probs=None,
+                    y_true=self.targets_test_all.cpu().numpy(),
+                    preds=self.preds_test_all.cpu().numpy(),
+                    class_names=class_names,
+                )
+            }
+        )
 
         # self.logger.experiment.log(
         #     {
