@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: stl-topex-printer-32-rgb+rgb-t2i
+  name: stl-topex-printer-32-rgb-plus-rgb-t2i
 spec:
   restartPolicy: Never
   containers:
-    - name: stl-topex-printer-32-rgb+rgb-t2i
+    - name: stl-topex-printer-32-rgb-plus-rgb-t2i
       image: beuthdritter/synthnet-transfer-learning
       env:
         - name: GIT_NAME
