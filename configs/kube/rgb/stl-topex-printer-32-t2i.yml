@@ -44,7 +44,8 @@ spec:
           cd /workspace;
           cp -r /src-pv/synthnet-transfer-learning/* /workspace;
           python -u src/train.py -m 'experiment=
-          STL-topex-printer-32-t2i/src_only/swinv2_ch_sgd1e-3'
+          STL-topex-printer-32-t2i/uda/swinv2_ch-uda_cdan-mcc_adamw1e-5_warmupcalr_augmix.yaml,
+          STL-topex-printer-32-t2i/src_only/swinv2_ch-ft_augmix.yaml'
       resources:
         limits:
           nvidia.com/gpu: 1

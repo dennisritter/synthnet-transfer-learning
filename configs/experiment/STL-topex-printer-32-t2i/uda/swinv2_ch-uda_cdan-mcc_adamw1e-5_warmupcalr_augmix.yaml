@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /data: topex-printer-32-uda-t2i.yaml
+  - override /data: topex-printer-32-t2i-uda.yaml
   - override /model: vit_cdan.yaml
   - override /callbacks: default_ada.yaml
   - override /trainer: default.yaml
@@ -27,7 +27,7 @@ trainer:
 
 model:
   model_name: microsoft/swinv2-base-patch4-window12-192-22k
-  fine_tuning_checkpoint: CHECKPOINT PATH
+  fine_tuning_checkpoint: out/synthnet-transfer-learning-outputs/train/multiruns/STL-topex-printer-32-t2i/src_only/swinv2_ch_sgd1e-3/2024-02-14_13-38-24/0/checkpoints/epoch_014.ckp
   optimizer:
     _target_: torch.optim.AdamW
     _partial_: true
