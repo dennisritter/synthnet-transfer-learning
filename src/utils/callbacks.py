@@ -12,6 +12,19 @@ from utils.transforms import UnNormalize
 log = utils.get_pylogger(__name__)
 
 
+class FreezeAll(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        # freeze any module you want
+        for name, param in pl_module.net.named_parameters():
+            param.requires_grad = False
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
 class FreezeAllButLast(BaseFinetuning):
     def __init__(self):
         super().__init__()
@@ -21,7 +34,6 @@ class FreezeAllButLast(BaseFinetuning):
         for name, param in pl_module.net.named_parameters():
             param.requires_grad = False
 
-        # TODO: Make generic or add model name to know how to select last layers
         # TODO: Make generic or add model name to know how to select last layers
         # For most models. Ohne classification layer named classifier
         if hasattr(pl_module.net, "classifier"):
@@ -38,6 +50,90 @@ class FreezeAllButLast(BaseFinetuning):
 
         for name, param in pl_module.net.named_parameters():
             log.debug(f"{name}: requires_grad={param.requires_grad}")
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2PatchPartitionAndLinearEmbeddingLayers(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        for param in pl_module.net.swinv2.embeddings.parameters():
+            param.requires_grad = True
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2Stage0(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        for param in pl_module.net.swinv2.encoder.layers[0].parameters():
+            param.requires_grad = True
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2Stage1(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        for param in pl_module.net.swinv2.encoder.layers[1].parameters():
+            param.requires_grad = True
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2Stage2(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        for param in pl_module.net.swinv2.encoder.layers[2].parameters():
+            param.requires_grad = True
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2Stage3(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        for param in pl_module.net.swinv2.encoder.layers[3].parameters():
+            param.requires_grad = True
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2GlobalAvgPoolingLayer(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        for param in pl_module.net.swinv2.layernorm.parameters():
+            param.requires_grad = True
+
+    def finetune_function(self, pl_module, epoch, optimizer) -> None:
+        pass
+
+
+class UnfreezeSwinv2Classifier(BaseFinetuning):
+    def __init__(self):
+        super().__init__()
+
+    def freeze_before_training(self, pl_module):
+        pl_module.net.classifier.weight.requires_grad = True
+        pl_module.net.classifier.bias.requires_grad = True
 
     def finetune_function(self, pl_module, epoch, optimizer) -> None:
         pass

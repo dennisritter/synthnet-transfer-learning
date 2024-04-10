@@ -1,0 +1,3 @@
+# Log some prediction samples
+unfreeze_swinv2_patch_partition_and_linear_embedding_layers:
+  _target_: utils.callbacks.UnfreezeSwinv2PatchPartitionAndLinearEmbeddingLayers

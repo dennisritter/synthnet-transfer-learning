@@ -1,0 +1,3 @@
+# Log some prediction samples
+unfreeze_swinv2_stage3:
+  _target_: utils.callbacks.UnfreezeSwinv2Stage3

@@ -1,0 +1,3 @@
+# Log some prediction samples
+unfreeze_swinv2_global_avg_pooling_layer:
+  _target_: utils.callbacks.UnfreezeSwinv2GlobalAvgPoolingLayer
