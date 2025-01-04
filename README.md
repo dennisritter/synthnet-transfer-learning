@@ -109,14 +109,26 @@ You can override any parameter from command line without changing any config fil
 python src/train.py experiment=my_experiment trainer.max_epochs=10 data.batch_size=64
 ```
 ## Citation
-Please cite our [paper](https://arxiv.org/abs/2310.04757) if you use this Code or the Topex-Printer dataset. 
+Please cite our [paper](https://doi.org/10.1007/978-3-031-74640-6_33) if you use this Code or the Topex-Printer dataset. 
 ```
-@misc{ritter2023cad,
-      title={CAD Models to Real-World Images: A Practical Approach to Unsupervised Domain Adaptation in Industrial Object Classification}, 
-      author={Dennis Ritter and Mike Hemberger and Marc Hönig and Volker Stopp and Erik Rodner and Kristian Hildebrand},
-      year={2023},
-      eprint={2310.04757},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@InProceedings{10.1007/978-3-031-74640-6_33,
+author="Ritter, Dennis
+and Hemberger, Mike
+and H{\"o}nig, Marc
+and Stopp, Volker
+and Rodner, Erik
+and Hildebrand, Kristian",
+editor="Meo, Rosa
+and Silvestri, Fabrizio",
+title="CAD Models to Real-World Images: A Practical Approach to Unsupervised Domain Adaptation in Industrial Object Classification",
+booktitle="Machine Learning and Principles and Practice of Knowledge Discovery in Databases",
+year="2025",
+publisher="Springer Nature Switzerland",
+address="Cham",
+pages="399--415",
+abstract="In this paper, we systematically analyze unsupervised domain adaptation pipelines for object classification in a challenging industrial setting. In contrast to standard natural object benchmarks existing in the field, our results highlight the most important design choices when only category-labeled CAD models are available but classification needs to be done with real-world images. Our domain adaptation pipeline achieves SoTA performance on the VisDA benchmark, but more importantly, drastically improves recognition performance on our new open industrial dataset comprised of 102 mechanical parts. We conclude with a set of guidelines that are relevant for practitioners needing to apply state-of-the-art unsupervised domain adaptation in practice. Our code is available at https://github.com/dritter-bht/synthnet-transfer-learning.",
+isbn="978-3-031-74640-6"
 }
+
+
 ```
