@@ -128,6 +128,4 @@ pages="399--415",
 abstract="In this paper, we systematically analyze unsupervised domain adaptation pipelines for object classification in a challenging industrial setting. In contrast to standard natural object benchmarks existing in the field, our results highlight the most important design choices when only category-labeled CAD models are available but classification needs to be done with real-world images. Our domain adaptation pipeline achieves SoTA performance on the VisDA benchmark, but more importantly, drastically improves recognition performance on our new open industrial dataset comprised of 102 mechanical parts. We conclude with a set of guidelines that are relevant for practitioners needing to apply state-of-the-art unsupervised domain adaptation in practice. Our code is available at https://github.com/dritter-bht/synthnet-transfer-learning.",
 isbn="978-3-031-74640-6"
 }
-
-
 ```
