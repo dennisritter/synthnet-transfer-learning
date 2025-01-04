@@ -10,8 +10,8 @@
 [![isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/) <br>
 <a href="https://github.com/ashleve/lightning-hydra-template"><img alt="Template" src="https://img.shields.io/badge/-Lightning--Hydra--Template-017F2F?style=flat&logo=github&labelColor=gray"></a><br>
 
-[![Paper](https://img.shields.io/badge/%20paper-blue?style=flat)](https://arxiv.org/pdf/2310.04757.pdf)
-<!-- [![Conference](img)](link) -->
+[![Paper](https://img.shields.io/badge/%20paper-blue?style=flat)](https://doi.org/10.1007/978-3-031-74640-6_33)
+<!-- [![ECML PKDD 2023](https://img.shields.io/badge/%20paper-blue?style=flat)](https://doi.org/10.1007/978-3-031-74640-6_33)](https://2023.ecmlpkdd.org/)
 
 </div>
 
